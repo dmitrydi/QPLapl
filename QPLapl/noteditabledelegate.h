@@ -1,0 +1,28 @@
+#ifndef NOTEDITABLEDELEGATE_H
+#define NOTEDITABLEDELEGATE_H
+
+#include <QItemDelegate>
+#include <QObject>
+
+class NotEditableDelegate : public QItemDelegate
+{
+    Q_OBJECT
+public:
+    explicit NotEditableDelegate(QObject *parent = 0)
+        : QItemDelegate(parent)
+    {}
+
+protected:
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+    {
+        Q_UNUSED(event);
+        Q_UNUSED(model);
+        Q_UNUSED(option);
+        Q_UNUSED(index);
+        return false;
+    }
+    QWidget* createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const
+    { return Q_NULLPTR; }
+};
+
+#endif // NOTEDITABLEDELEGATE_H
