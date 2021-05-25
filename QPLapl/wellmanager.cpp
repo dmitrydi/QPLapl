@@ -39,6 +39,13 @@ QList<Matrix3DV> WellManager::GridCalc() const {
 }
 
 
+void WellManager::PrintParams(QTextStream& ts) const {
+    PrintFluidRock(ts);
+    PrintWell(ts);
+    PrintDrainage(ts);
+    PrintBoundary(ts);
+    PrintPQHeader(ts);
+}
 
 void WellManager::CreateWell() {
     switch (*pk.wt) {
@@ -302,3 +309,196 @@ double ParamKeeper::LRef() const {
         return *rw;
     }
 }
+
+void WellManager::PrintFluidRock(QTextStream& ts) const {
+    CHECK_OPT(pk.usys);
+    CHECK_OPT(pk.perm);
+    CHECK_OPT(pk.h);
+    CHECK_OPT(pk.fi);
+    CHECK_OPT(pk.mu);
+    CHECK_OPT(pk.ct);
+    CHECK_OPT(pk.pinit);
+    CHECK_OPT(pk.boil);
+    QString permUnits;
+    QString hUnits;
+    QString poroUnits;
+    QString muUnits;
+    QString ctUnits;
+    QString pinitUnits;
+    QString boilUnits;
+    switch (*pk.usys) {
+    case UNITSYSTEM::OILFIELD:
+        permUnits = " md";
+        hUnits = " m";
+        poroUnits = " fraction";
+        muUnits = " cP";
+        ctUnits = " 1/atm";
+        pinitUnits = " atm";
+        boilUnits = " std.m3/m3";
+        break;
+    case UNITSYSTEM::SI:
+        permUnits = " m2";
+        hUnits = " m";
+        poroUnits = " fraction";
+        muUnits = " Pa*s";
+        ctUnits = " 1/Pa";
+        pinitUnits = " Pa";
+        boilUnits = " std.m3/m3";
+        break;
+    case UNITSYSTEM::US:
+        permUnits = " md";
+        hUnits = " ft";
+        poroUnits = " fraction";
+        muUnits = " cP";
+        ctUnits = " 1/psi";
+        pinitUnits = " psi";
+        boilUnits = " std.bbl/bbl";
+        break;
+    }
+    ts << "====Fluid and Rock====\n";
+    ts << "perm " << *pk.perm << permUnits << "\n";
+    ts << "net pay " << *pk.h << hUnits << "\n";
+    ts << "poro " << *pk.fi << poroUnits << "\n";
+    ts << "viscosity " << *pk.mu << muUnits << "\n";
+    ts << "compressibility " << *pk.ct << ctUnits << "\n";
+    ts << "formation volume factor " << *pk.boil << boilUnits << "\n";
+    ts << "initial formation pressure " << *pk.pinit << pinitUnits << "\n";
+};
+
+void WellManager::PrintWell(QTextStream& ts) const {
+    CHECK_OPT(pk.usys);
+    CHECK_OPT(pk.wt);
+    QString lunits;
+    switch (*pk.usys) {
+    case UNITSYSTEM::OILFIELD:
+        lunits = " m";
+        break;
+    case UNITSYSTEM::SI:
+        lunits = " m";
+        break;
+    case UNITSYSTEM::US:
+        lunits = " ft";
+        break;
+    }
+    ts << "====Well====\n";
+    switch (*pk.wt) {
+    case WellType::Fracture:
+        CHECK_OPT(pk.xf);
+        CHECK_OPT(pk.Fcd);
+        ts << "Fracture\n";
+        ts << "xf " << *pk.xf << lunits << "\n";
+        ts << "Fcd " << *pk.Fcd << "\n";
+        break;
+    case WellType::MultiFractured:
+        CHECK_OPT(pk.xf);
+        CHECK_OPT(pk.Fcd);
+        CHECK_OPT(pk.lh);
+        CHECK_OPT(pk.nfrac);
+        ts << "Multifracture\n";
+        ts << "xf " << *pk.xf << lunits << "\n";
+        ts << "Fcd " << *pk.Fcd << "\n";
+        ts << "Nfrac " << *pk.nfrac << "\n";
+        ts << "Lh " << (*pk.lh)*2 << lunits << "\n";
+        break;
+    case WellType::Horizontal:
+        CHECK_OPT(pk.lh);
+        CHECK_OPT(pk.rw);
+        CHECK_OPT(pk.zw);
+        ts << "Horizontal\n";
+        ts << "Lh " << (*pk.lh)*2 << lunits << "\n";
+        ts << "zw " << *pk.zw << lunits << "\n";
+        ts << "rw " << *pk.rw << lunits << "\n";
+        break;
+    case WellType::Vertical:
+        CHECK_OPT(pk.rw);
+        ts << "Vertical\n";
+        ts << "rw " << *pk.rw << lunits << "\n";
+        break;
+    }
+}
+void WellManager::PrintDrainage(QTextStream& ts) const {
+    CHECK_OPT(pk.usys);
+    CHECK_OPT(pk.drng);
+    QString lunits;
+    switch (*pk.usys) {
+    case UNITSYSTEM::OILFIELD:
+        lunits = " m";
+        break;
+    case UNITSYSTEM::SI:
+        lunits = " m";
+        break;
+    case UNITSYSTEM::US:
+        lunits = " ft";
+        break;
+    }
+    ts << "====Drainage Area====\n";
+    switch (*pk.drng) {
+    case DrainageArea::Rectangular:
+        CHECK_OPT(pk.xe);
+        CHECK_OPT(pk.ye);
+        CHECK_OPT(pk.xw);
+        CHECK_OPT(pk.yw);
+        ts << "Rectangle\n";
+        ts << "xe " << *pk.xe << lunits << "\n";
+        ts << "ye " << *pk.ye << lunits << "\n";
+        ts << "xw " << *pk.xw << lunits << "\n";
+        ts << "yw " << *pk.yw << lunits << "\n";
+        break;
+    case DrainageArea::Circle:
+        CHECK_OPT(pk.re);
+        ts << "Circle\n";
+        ts << "re " << *pk.re << lunits << "\n";
+        break;
+    case DrainageArea::Infinite:
+        ts << "Infinite\n";
+        break;
+    }
+}
+void WellManager::PrintBoundary(QTextStream& ts) const {
+    CHECK_OPT(pk.bnd);
+    ts << "====Boundary====\n";
+    switch (*pk.bnd) {
+    case Boundary::NNNN:
+        ts << "Impearmable\n";
+        break;
+    case Boundary::CCCC:
+        ts << "Constant pressure\n";
+        break;
+    }
+}
+void WellManager::PrintPQHeader(QTextStream& ts) const {
+    CHECK_OPT(pk.usys);
+    CHECK_OPT(pk.clcm);
+    QString qunits, punits, tunits;
+    switch (*pk.usys) {
+    case UNITSYSTEM::OILFIELD:
+        qunits = " m3/day";
+        punits = " atm";
+        tunits = " hr";
+        break;
+    case UNITSYSTEM::SI:
+        qunits = " m3/s";
+        punits = " Pa";
+        tunits = " s";
+        break;
+    case UNITSYSTEM::US:
+        qunits = " bbl/day";
+        punits = " psi";
+        tunits = " hr";
+        break;
+    }
+    ts << "====Well results====\n";
+    switch (*pk.clcm) {
+    case CALCMODE::LIQCONST:
+        CHECK_OPT(pk.qwell);
+        ts << "Liquid rate " << *pk.qwell << qunits << "\n";
+        ts << "Time," << tunits << " " << "Wellbore Pressure, " << punits << "\n";
+        break;
+    case CALCMODE::PRESCONST:
+        CHECK_OPT(pk.pwell);
+        ts << "Wellbore pressure " << *pk.pwell << punits << "\n";
+        ts << "Time," << tunits << " " << "Well Rate, " << qunits << "\n";
+        break;
+    }
+}
+

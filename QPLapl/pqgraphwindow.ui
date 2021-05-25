@@ -75,14 +75,14 @@
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="pushSave">
       <property name="text">
        <string>Save to file..</string>
       </property>
      </widget>
     </item>
     <item row="0" column="2">
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="pushClose">
       <property name="text">
        <string>Close</string>
       </property>

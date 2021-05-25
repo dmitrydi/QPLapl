@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushPQ, &QPushButton::released, this, &MainWindow::runWellManagerPQ);
     connect(this, &MainWindow::PQDataCalculated, graphWin, &PQGraphWindow::FillData);
     connect(ui->pushShowGraph, &QPushButton::released, graphWin, &PQGraphWindow::ShowGraph);
+    connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
 }
 
 MainWindow::~MainWindow()
@@ -36,6 +37,21 @@ void MainWindow::runWellManagerPQ() {
     setWellManagerData();
     PQTData = wellManager->PQCalc();
     emit PQDataCalculated(PQTData);
+}
+
+void MainWindow::SavePQData()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "data.txt");
+    if (filePath.isEmpty()) return;
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+        wellManager->PrintParams(stream);
+        for (const auto& d: PQTData) {
+            stream << d.first << " " << d.second << "\n";
+        }
+    }
+    file.close();
 }
 
 //---------------------------------------

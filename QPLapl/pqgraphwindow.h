@@ -34,6 +34,7 @@ private:
 signals:
     void DataFilled(QtCharts::QLineSeries*);
     void AxisUpdated();
+    void SaveData();
 private slots:
     void setXLinAxis(QtCharts::QLineSeries*);
     void setYLinAxis(QtCharts::QLineSeries*);

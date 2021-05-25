@@ -12,6 +12,7 @@
 #include "labelmapper.h"
 #include <optional>
 #include <stdexcept>
+#include <QTextStream>
 
 #define CHECK_OPT_PARAM(opt_param, text) {  \
     if(!(opt_param)) {                      \
@@ -117,7 +118,7 @@ public:
     void setMu(const QString&);
     void setBoil(const QString&);
     void setCt(const QString&);
-
+    void PrintParams(QTextStream&) const;
 signals:
     void WellIsSet(bool);
 
@@ -125,6 +126,11 @@ private:
     mutable LaplWell *well;
     ParamKeeper pk;
     void CreateWell();
+    void PrintFluidRock(QTextStream&) const;
+    void PrintWell(QTextStream&) const;
+    void PrintDrainage(QTextStream&) const;
+    void PrintBoundary(QTextStream&) const;
+    void PrintPQHeader(QTextStream&) const;
 };
 
 #endif // WELLMANAGER_H

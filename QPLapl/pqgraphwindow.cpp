@@ -29,6 +29,8 @@ PQGraphWindow::PQGraphWindow(QWidget *parent) :
     connect(this, &PQGraphWindow::AxisUpdated, this, &PQGraphWindow::UpdateChart);
     onXStateChanged(Qt::Unchecked);
     onYStateChanged(Qt::Unchecked);
+    connect(ui->pushSave, &QPushButton::released, this, &PQGraphWindow::SaveData);
+    connect(ui->pushClose, &QPushButton::released, this, &PQGraphWindow::close);
 }
 
 void PQGraphWindow::UpdateChart() {

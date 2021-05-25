@@ -12,6 +12,8 @@
 #include "wellmanager.h"
 #include "mainwindowdata.h"
 #include "pqgraphwindow.h"
+#include <QFileDialog>
+#include <QTextStream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,9 +29,8 @@ public:
 
 signals:
     void PQDataCalculated(const QVector<DataPoint>&);
-
 public slots:
-
+    void SavePQData();
 private:
     friend class MainWindowData;
     Ui::MainWindow *ui;
@@ -85,10 +86,12 @@ private:
     //-- Interaction with WellManager
     void setWellManagerData();
     void runWellManagerPQ();
-
     void refreshAndRunDialog();
 private slots:
     void timeDataChanged(QStandardItem* item);
 
+
 };
+
+
 #endif // MAINWINDOW_H
