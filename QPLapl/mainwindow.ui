@@ -566,41 +566,349 @@
        <string>Well Schedule</string>
       </property>
      </widget>
-     <widget class="QTableView" name="tableWellSchedule">
+     <widget class="QCheckBox" name="checCalcSpat">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>340</x>
+        <y>10</y>
+        <width>181</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Calculate Spatial Distribution</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelSpatSchedule">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>110</y>
+        <width>181</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Well Schedule For Spatial Distribution</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelWarningSpat">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>30</y>
+        <width>271</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Warning: spatial calculations may be time-comsuming!</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelGridParams">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
+        <y>110</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Grid parametes</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="gridLayoutWidget_6">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
         <y>130</y>
-        <width>256</width>
-        <height>331</height>
+        <width>199</width>
+        <height>241</height>
        </rect>
       </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="7" column="2">
+        <widget class="QComboBox" name="comboLinLogNzBottom">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_2"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Nz Bottom</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="lineEdit_8"/>
+       </item>
+       <item row="0" column="2">
+        <widget class="QComboBox" name="comboLinLogNxLeft">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Nx Well</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Nz Top</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QComboBox" name="comboLinLogNxRight">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_5"/>
+       </item>
+       <item row="3" column="2">
+        <widget class="QComboBox" name="comboLinLogNyTop">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelNxLeft">
+         <property name="text">
+          <string>Nx Left</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEditNxLeft"/>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="lineEdit_6"/>
+       </item>
+       <item row="8" column="1">
+        <widget class="QLineEdit" name="lineEdit_9"/>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="lineEdit_7"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Ny Between</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_3"/>
+       </item>
+       <item row="4" column="2">
+        <widget class="QComboBox" name="comboLinLogNxWell">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QComboBox" name="comboLinLogNyBottom">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QComboBox" name="comboLinLogNzTop">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Nx Between</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Nx Right</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Ny Bottom</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_4"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Ny Top</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QComboBox" name="comboLinLogNwBetween">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="QComboBox" name="comboLinLogNyBetween">
+         <item>
+          <property name="text">
+           <string>Log</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
-     <widget class="QPushButton" name="pushPQ">
+     <widget class="QPushButton" name="pushShowScheme">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>470</y>
+        <x>670</x>
+        <y>380</y>
         <width>75</width>
         <height>23</height>
        </rect>
       </property>
       <property name="text">
-       <string>Calculate</string>
+       <string>Show Scheme</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushShowGraph">
+     <widget class="QWidget" name="verticalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>470</y>
-        <width>75</width>
-        <height>23</height>
+        <x>20</x>
+        <y>130</y>
+        <width>291</width>
+        <height>351</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Show</string>
+      <layout class="QVBoxLayout" name="PQSchedLayout"/>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>130</y>
+        <width>291</width>
+        <height>351</height>
+       </rect>
       </property>
+      <layout class="QVBoxLayout" name="GridSchedLayout"/>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Page</string>
+     </attribute>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>40</y>
+        <width>341</width>
+        <height>451</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="testLayout"/>
      </widget>
     </widget>
    </widget>

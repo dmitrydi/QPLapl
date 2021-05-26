@@ -10,10 +10,10 @@
 #include "picmanager.h"
 #include "noteditabledelegate.h"
 #include "wellmanager.h"
-#include "mainwindowdata.h"
 #include "pqgraphwindow.h"
 #include <QFileDialog>
 #include <QTextStream>
+#include "tablewellschedule.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,8 +41,6 @@ private:
     UniComboBox *uComboBoundaryConditions;
     UniComboBox *uComboCalcMode;
     PicManager *picMan;
-    QStandardItemModel *tableScheduleModel;
-    MainWindowData *dataContainer;
     WellManager *wellManager;
     QVector<DataPoint> PQTData;
     void setupUComboUnits();
@@ -76,19 +74,19 @@ private:
     void setupPicMan();
     void setupCalcModeLabels();
     // table schedule model
-    void _setTableScheduleHeaders(const QString& units);
-    void initTableScheduleModel();
-    void maybeAddTimeRow(QStandardItem* item);
-    void setLiqAndPres(const QString& calcMode, const QString& liqvalue, const QString& presvalue) ;
-    //--- table schedule functions
-    void _setTableColsVisibility(const QString& calcmode);
-    void setupTableSchedule();
+    TableWellSchedule *PQSchedule;
+    TableWellSchedule *GridSchedule;
+    void SetupPQSchedule();
+    void SetupGridSchedule();
     //-- Interaction with WellManager
     void setWellManagerData();
     void runWellManagerPQ();
     void refreshAndRunDialog();
+    //-- Spatial Calc
+
+
 private slots:
-    void timeDataChanged(QStandardItem* item);
+
 
 
 };

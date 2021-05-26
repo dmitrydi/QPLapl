@@ -19,12 +19,12 @@ SOURCES += \
     linlogaxis.cpp \
     main.cpp \
     mainwindow.cpp \
-    mainwindowdata.cpp \
     matrix3dv.cpp \
     noteditabledelegate.cpp \
     pqgraphwindow.cpp \
     qgaus.cpp \
     surfacegraph.cpp \
+    tablewellschedule.cpp \
     unicombobox.cpp \
     wellmanager.cpp \
     xymodel.cpp \
@@ -38,13 +38,13 @@ HEADERS += \
     labelmapper.h \
     linlogaxis.h \
     mainwindow.h \
-    mainwindowdata.h \
     matrix3dv.h \
     noteditabledelegate.h \
     pqgraphwindow.h \
     qgaus.h \
     quadrature.h \
     surfacegraph.h \
+    tablewellschedule.h \
     unicombobox.h \
     wellmanager.h \
     xymodel.h \

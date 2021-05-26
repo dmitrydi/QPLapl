@@ -19,18 +19,27 @@ MainWindow::MainWindow(QWidget *parent)
     setupDrainageAreaLabels();
     setupPicMan();
     setupCalcModeLabels();
-    setupTableSchedule();
-
-    connect(ui->pushPQ, &QPushButton::released, this, &MainWindow::runWellManagerPQ);
+    SetupPQSchedule();
+    SetupGridSchedule();
     connect(this, &MainWindow::PQDataCalculated, graphWin, &PQGraphWindow::FillData);
-    connect(ui->pushShowGraph, &QPushButton::released, graphWin, &PQGraphWindow::ShowGraph);
     connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
+}
+
+void MainWindow::SetupPQSchedule() {
+    PQSchedule = new TableWellSchedule(uComboUnits, uComboCalcMode, ui->lineEditLiquidRate, ui->lineEditWellborePressure);
+    ui->PQSchedLayout->addWidget(PQSchedule);
+    connect(PQSchedule, &TableWellSchedule::ButtonCalculatePressed, this, &MainWindow::runWellManagerPQ);
+    connect(PQSchedule, &TableWellSchedule::ButtonShowPressed, graphWin, &PQGraphWindow::ShowGraph);
+    connect(PQSchedule, &TableWellSchedule::ButtonSavePressed, this, &MainWindow::SavePQData);
+}
+void MainWindow::SetupGridSchedule() {
+    GridSchedule = new TableWellSchedule(uComboUnits, uComboCalcMode, ui->lineEditLiquidRate, ui->lineEditWellborePressure);
+    ui->GridSchedLayout->addWidget(GridSchedule);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
 }
 
 void MainWindow::runWellManagerPQ() {
@@ -308,99 +317,6 @@ void MainWindow::setupCalcModeLabels() {
             this, &MainWindow::_setupeCalcModeUnits);
 }
 
-
-void MainWindow::_setTableScheduleHeaders(const QString& units) {
-    tableScheduleModel->setHeaderData(0, Qt::Horizontal, "Time, " + unitsMapper
-                                      .value(mapStrToUnitSystem.value(units))
-                                      .value(PARAMS::TIME), Qt::EditRole);
-    tableScheduleModel->setHeaderData(1, Qt::Horizontal, "Well rate, " + unitsMapper
-                                      .value(mapStrToUnitSystem.value(units))
-                                      .value(PARAMS::LIQRATE), Qt::DisplayRole);
-    tableScheduleModel->setHeaderData(2, Qt::Horizontal, "Wellbore pressure, " + unitsMapper
-                                      .value(mapStrToUnitSystem.value(units))
-                                      .value(PARAMS::WELLPRES), Qt::DisplayRole);
-}
-
-void MainWindow::initTableScheduleModel() {
-    tableScheduleModel = new QStandardItemModel(this);
-    tableScheduleModel->setRowCount(tableScheduleModeInitRows);
-    tableScheduleModel->setColumnCount(tableScheduleModelColumns);
-    _setTableScheduleHeaders(uComboUnits->text());
-    connect(uComboUnits, &UniComboBox::textChanged,
-            this, &MainWindow::_setTableScheduleHeaders);
-    connect(tableScheduleModel, &QStandardItemModel::itemChanged,
-            this, &MainWindow::timeDataChanged);
-
-    connect(uComboCalcMode, &UniComboBox::textChanged,
-            [this](const QString& calcmode){
-        this->setLiqAndPres(calcmode, ui->lineEditLiquidRate->text(), ui->lineEditWellborePressure->text());
-    });
-
-    connect(ui->lineEditLiquidRate, &QLineEdit::textChanged,
-            [this](const QString& liqrate){
-        this->setLiqAndPres(this->uComboCalcMode->text(), liqrate, this->ui->lineEditWellborePressure->text());
-    });
-    connect(ui->lineEditWellborePressure, &QLineEdit::textChanged,
-            [this](const QString& wellpres){
-        this->setLiqAndPres(this->uComboCalcMode->text(), this->ui->lineEditLiquidRate->text(), wellpres);
-    });
-}
-
-void MainWindow::maybeAddTimeRow(QStandardItem* item) {
-    int col = item->column();
-    int row = item->row();
-    if (col == 0 && (row == (tableScheduleModel->rowCount() - 1))) {
-        QModelIndex liqIndex = tableScheduleModel->index(row, 1);
-        QModelIndex presIndex = tableScheduleModel->index(row, 2);
-        tableScheduleModel->setData(liqIndex, ui->lineEditLiquidRate->text());
-        tableScheduleModel->setData(presIndex, ui->lineEditWellborePressure->text());
-        QList<QStandardItem*> row;
-        for (int c = 0; c < tableScheduleModel->columnCount(); ++c) {
-            QStandardItem *item = new QStandardItem();
-            row.append(item);
-        }
-        tableScheduleModel->appendRow(row);
-    }
-}
-
-void MainWindow::setLiqAndPres(const QString& calcMode, const QString& liqvalue, const QString& presvalue) {
-    if (calcMode == "Constant Liquid Rate") {
-        for (int row = 0; row < tableScheduleModel->rowCount()-1; ++row) {
-            QModelIndex itemIndex = tableScheduleModel->index(row, strToTableScheduleColumn.value(calcMode));
-            tableScheduleModel->setData(itemIndex, liqvalue);
-        }
-    } else if (calcMode == "Constant Wellbore Pressure") {
-        for (int row = 0; row < tableScheduleModel->rowCount()-1; ++row) {
-            QModelIndex itemIndex = tableScheduleModel->index(row, strToTableScheduleColumn.value(calcMode));
-            tableScheduleModel->setData(itemIndex, presvalue);
-        }
-    }
-
-}
-
-void MainWindow::timeDataChanged(QStandardItem* item) {
-    maybeAddTimeRow(item);
-}
-
-void MainWindow::_setTableColsVisibility(const QString& calcmode) {
-    ui->tableWellSchedule->hideColumn(1);
-    ui->tableWellSchedule->hideColumn(2);
-    ui->tableWellSchedule->showColumn(strToTableScheduleColumn.value(calcmode));
-}
-
-void MainWindow::setupTableSchedule() {
-    initTableScheduleModel();
-    ui->tableWellSchedule->setModel(tableScheduleModel);
-    for(int c = 0; c < ui->tableWellSchedule->model()->columnCount(); c++)
-    {
-        if(c != 0)
-            ui->tableWellSchedule->setItemDelegateForColumn(c, new NotEditableDelegate(ui->tableWellSchedule));
-    }
-    _setTableColsVisibility(uComboCalcMode->text());
-    connect(uComboCalcMode, &UniComboBox::textChanged,
-            this, &MainWindow::_setTableColsVisibility);
-}
-
 void MainWindow::setWellManagerData() {
     wellManager->setUnitSystem(uComboUnits->text());
     wellManager->setBoundary(uComboBoundaryConditions->text());
@@ -419,7 +335,7 @@ void MainWindow::setWellManagerData() {
     wellManager->setLh(ui->lineEditHorizontalWellLength->text());
     wellManager->setXf(ui->lineEditFracXf->text());
     wellManager->setNFrac(ui->lineEditNumOfFractures->text());
-    wellManager->setTSchedule(tableScheduleModel);
+    wellManager->setTSchedule(PQSchedule->getModel());
     wellManager->setP(ui->lineEditWellborePressure->text());
     wellManager->setQ(ui->lineEditLiquidRate->text());
     wellManager->setPinit(ui->lineEditPi->text());
