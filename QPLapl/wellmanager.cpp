@@ -5,6 +5,10 @@ WellManager::WellManager(QObject *parent) : QObject(parent),
   well(nullptr)
 {}
 
+WellManager::~WellManager() {
+    if (well) delete well;
+}
+
 QVector<DataPoint> ZipToDatapointVector(const std::vector<double>& ts, const std::vector<double>& vals) {
     if (ts.size() != vals.size())
         throw std::invalid_argument("dimentions of vectors must be equal\n");
@@ -20,7 +24,7 @@ QVector<DataPoint> WellManager::PQCalc() {
     if (well)
         delete well;
     CreateWell();
-    std::vector<double> ts = pk.GetTPQ();
+    std::vector<double> ts = pk.GetTs(pk.tpqmodel);
     std::vector<double> tds = pk.GetTds(ts);
     std::vector<double> values(tds.size());
     switch (*pk.clcm) {
@@ -34,10 +38,23 @@ QVector<DataPoint> WellManager::PQCalc() {
     return ZipToDatapointVector(ts, pk.GetPQ(values));
 }
 
-QList<Matrix3DV> WellManager::GridCalc() const {
+QList<Matrix3DV> WellManager::GridCalc() {
     //return {};
+    QList<Matrix3DV> ans;
+    if (well)
+        delete well;
+    CreateWell();
+    std::vector<double> ts = pk.GetTs(pk.tgridmodel);
+    std::vector<double> tds = pk.GetTds(ts);
+    std::vector<double> xds = pk.GetGridX();
+    std::vector<double> yds = pk.GetGridY();
+    std::vector<double> zds = pk.GetGridZ();
+    for (const auto& td: tds) {
+        ans.push_back(well->pd_m_parallel(td, 4, xds, yds, zds));
+    }
+    pk.TransformToDimentionGrid(ans);
+    return ans;
 }
-
 
 void WellManager::PrintParams(QTextStream& ts) const {
     PrintFluidRock(ts);
@@ -48,6 +65,7 @@ void WellManager::PrintParams(QTextStream& ts) const {
 }
 
 void WellManager::CreateWell() {
+    if (well) delete well;
     switch (*pk.wt) {
     case WellType::Fracture:
         switch (*pk.drng) {
@@ -126,6 +144,10 @@ void WellManager::setTSchedule(const QStandardItemModel* m) {
     pk.tpqmodel = m;
 }
 
+void WellManager::setGridSchedule(const QStandardItemModel *m) {
+    pk.tgridmodel = m;
+}
+
 void WellManager::setQ(const QString& sval) {
     pk.qwell = sval.toDouble();
 }
@@ -198,7 +220,7 @@ Boundary ParamKeeper::boundary() const {
     return *bnd;
 }
 
-std::vector<double> ParamKeeper::GetTPQ() const {
+std::vector<double> ParamKeeper::GetTs(const QStandardItemModel *tpqmodel) const {
     CHECK_OPT(tpqmodel);
     std::vector<double> ts;
     ts.reserve(tpqmodel->rowCount());
@@ -499,6 +521,112 @@ void WellManager::PrintPQHeader(QTextStream& ts) const {
         ts << "Wellbore pressure " << *pk.pwell << punits << "\n";
         ts << "Time," << tunits << " " << "Well Rate, " << qunits << "\n";
         break;
+    }
+}
+
+void WellManager::SetNxLeft(const GridSettings settings) {
+    pk.nxLeft = settings;
+}
+void WellManager::SetNxWell(const GridSettings settings) {
+    pk.nxWell = settings;
+}
+void WellManager::SetNxRight(const GridSettings settings) {
+    pk.nxRight = settings;
+}
+void WellManager::SetNyBottom(const GridSettings settings) {
+    pk.nyBottom = settings;
+}
+void WellManager::SetNyTop(const GridSettings settings) {
+    pk.nyTop = settings;
+}
+void WellManager::SetNyWell(const GridSettings settings) {
+    pk.nyWell = settings;
+}
+void WellManager::SetNzBottom(const GridSettings settings) {
+    pk.nzBottom = settings;
+}
+void WellManager::SetNzTop(const GridSettings settings) {
+    pk.nzTop = settings;
+}
+
+std::vector<double> ParamKeeper::GetGridX() const {
+    CHECK_OPT(wt);
+    CHECK_OPT(drng);
+    std::vector<double> ans;
+    std::vector<double> left, halfwell, right;
+    switch (*drng) {
+    case DrainageArea::Rectangular:
+        if (*wt == WellType::Fracture || *wt == WellType::Horizontal) {
+            CHECK_OPT(nxLeft);
+            CHECK_OPT(nxWell);
+            CHECK_OPT(nxRight);
+            left = LinLogGrid(0., xwd()-ld(), *nxLeft);
+            halfwell = LinLogGrid(xwd()-ld(), xwd(), *nxWell);
+            right = LinLogGrid(xwd() + ld(), xed(), *nxRight);
+            std::copy(left.begin(), left.end(), std::back_inserter(ans));
+            std::copy(halfwell.begin(), halfwell.end(), std::back_inserter(ans));
+            halfwell = LinLogGrid(xwd(), xwd() + ld(), *nxWell);
+            std::copy(halfwell.begin(), halfwell.end(), std::back_inserter(ans));
+            std::copy(right.begin(), right.end(), std::back_inserter(ans));
+        } else {
+            throw std::logic_error("not implemented\n");
+        }
+        break;
+    case DrainageArea::Circle:
+        throw std::logic_error("not implemented\n");
+    case DrainageArea::Infinite:
+        throw std::logic_error("not implemented\n");
+    default:
+        throw std::invalid_argument("ParamKeeper::GetGridX: unknown drainage area\n");
+    }
+    return ans;
+}
+std::vector<double> ParamKeeper::GetGridY() const {
+    CHECK_OPT(wt);
+    CHECK_OPT(drng);
+    std::vector<double> ans;
+    std::vector<double> bottom, top;
+    switch (*drng) {
+    case DrainageArea::Rectangular:
+        if (*wt == WellType::Fracture || *wt == WellType::Horizontal) {
+             CHECK_OPT(nyBottom);
+             CHECK_OPT(nyTop);
+             bottom = LinLogGrid(0., ywd(), *nyBottom);
+             top = LinLogGrid(ywd(), yed(), *nyTop);
+             std::copy(bottom.begin(), bottom.end(), std::back_inserter(ans));
+             std::copy(top.begin(), top.end(), std::back_inserter(ans));
+        } else {
+            throw std::logic_error("not implemented\n");
+        }
+        break;
+    case DrainageArea::Circle:
+        throw std::logic_error("not implemented\n");
+    case DrainageArea::Infinite:
+        throw std::logic_error("not implemented\n");
+    default:
+        throw std::invalid_argument("ParamKeeper::GetGridX: unknown drainage area\n");
+    }
+    return ans;
+}
+std::vector<double> ParamKeeper::GetGridZ() const {
+    CHECK_OPT(wt);
+    if (*wt == WellType::Fracture || *wt == WellType::Vertical || *wt == WellType::MultiFractured) {
+        return {0.};
+    } else {
+        throw std::logic_error("not implemented\n");
+    }
+}
+
+void ParamKeeper::TransformToDimentionGrid(QList<Matrix3DV>& gridList) {
+    for (auto& grid: gridList) {
+        for (auto& pt: grid) {
+            pt.x *= LRef();
+            pt.y *= LRef();
+            if (*wt == WellType::Horizontal) pt.z *= (*h);
+            double dimp = 18.42*(*qwell)*(*mu)*(*boil)/(*perm)/(*h);
+            pt.val = (*pinit - dimp*pt.val);
+
+        }
     }
 }
 

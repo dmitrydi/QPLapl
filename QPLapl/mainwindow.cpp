@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , graphWin(new PQGraphWindow(this))
+    , gridWin(new GridGraphWindow(this))
 {
     ui->setupUi(this);
     wellManager = new WellManager(this);
@@ -23,6 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
     SetupGridSchedule();
     connect(this, &MainWindow::PQDataCalculated, graphWin, &PQGraphWindow::FillData);
     connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
+
+    connect(this, &MainWindow::GridCalculated, gridWin, &GridGraphWindow::FillData);
+    connect(gridWin, &GridGraphWindow::SaveData, this, &MainWindow::SaveGridData);
+
+    //-------
+//    testGrid = new QGrid1D("Nx", LogDirection::MaxToMin);
+//    ui->testLayout->addWidget(testGrid);
+    //-------
 }
 
 void MainWindow::SetupPQSchedule() {
@@ -35,6 +44,9 @@ void MainWindow::SetupPQSchedule() {
 void MainWindow::SetupGridSchedule() {
     GridSchedule = new TableWellSchedule(uComboUnits, uComboCalcMode, ui->lineEditLiquidRate, ui->lineEditWellborePressure);
     ui->GridSchedLayout->addWidget(GridSchedule);
+    connect(GridSchedule, &TableWellSchedule::ButtonCalculatePressed, this, &MainWindow::runWellManagerGrid);
+    connect(GridSchedule, &TableWellSchedule::ButtonShowPressed, gridWin, &GridGraphWindow::ShowGraph);
+    connect(GridSchedule, &TableWellSchedule::ButtonSavePressed, this, &MainWindow::SaveGridData);
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +58,12 @@ void MainWindow::runWellManagerPQ() {
     setWellManagerData();
     PQTData = wellManager->PQCalc();
     emit PQDataCalculated(PQTData);
+}
+
+void MainWindow::runWellManagerGrid() {
+    setWellManagerData();
+    GridData = wellManager->GridCalc();
+    emit GridCalculated(GridData);
 }
 
 void MainWindow::SavePQData()
@@ -61,6 +79,10 @@ void MainWindow::SavePQData()
         }
     }
     file.close();
+}
+
+void MainWindow::SaveGridData() {
+    throw std::logic_error("not implemented\n");
 }
 
 //---------------------------------------
@@ -336,6 +358,7 @@ void MainWindow::setWellManagerData() {
     wellManager->setXf(ui->lineEditFracXf->text());
     wellManager->setNFrac(ui->lineEditNumOfFractures->text());
     wellManager->setTSchedule(PQSchedule->getModel());
+    wellManager->setGridSchedule(GridSchedule->getModel());
     wellManager->setP(ui->lineEditWellborePressure->text());
     wellManager->setQ(ui->lineEditLiquidRate->text());
     wellManager->setPinit(ui->lineEditPi->text());

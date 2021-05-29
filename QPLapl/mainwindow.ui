@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tabUnits">
      <attribute name="title">
@@ -905,7 +905,7 @@
         <x>40</x>
         <y>40</y>
         <width>341</width>
-        <height>451</height>
+        <height>161</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="testLayout"/>

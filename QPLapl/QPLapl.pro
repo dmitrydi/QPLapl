@@ -14,6 +14,7 @@ QT += widgets \
 
 SOURCES += \
     chbessel.cpp \
+    gridgraphwindow.cpp \
     gwell.cpp \
     interp_1d.cpp \
     linlogaxis.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
     noteditabledelegate.cpp \
     pqgraphwindow.cpp \
     qgaus.cpp \
+    qgrid1d.cpp \
     surfacegraph.cpp \
     tablewellschedule.cpp \
     unicombobox.cpp \
@@ -33,6 +35,7 @@ SOURCES += \
 HEADERS += \
     auxillary.h \
     chbessel.h \
+    gridgraphwindow.h \
     gwell.h \
     interp_1d.h \
     labelmapper.h \
@@ -42,6 +45,7 @@ HEADERS += \
     noteditabledelegate.h \
     pqgraphwindow.h \
     qgaus.h \
+    qgrid1d.h \
     quadrature.h \
     surfacegraph.h \
     tablewellschedule.h \

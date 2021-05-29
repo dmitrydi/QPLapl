@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include "tablewellschedule.h"
+#include "qgrid1d.h"
+#include "gridgraphwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,12 +31,15 @@ public:
 
 signals:
     void PQDataCalculated(const QVector<DataPoint>&);
+    void GridCalculated(const QList<Matrix3DV>&);
 public slots:
     void SavePQData();
+    void SaveGridData();
 private:
     friend class MainWindowData;
     Ui::MainWindow *ui;
     PQGraphWindow *graphWin;
+    GridGraphWindow *gridWin;
     UniComboBox *uComboUnits;
     UniComboBox *uComboWellType;
     UniComboBox *uComboAreaShape;
@@ -43,6 +48,7 @@ private:
     PicManager *picMan;
     WellManager *wellManager;
     QVector<DataPoint> PQTData;
+    QList<Matrix3DV> GridData;
     void setupUComboUnits();
     void setupUComboWellType();
     void setupUComboAeaShape();
@@ -81,9 +87,10 @@ private:
     //-- Interaction with WellManager
     void setWellManagerData();
     void runWellManagerPQ();
+    void runWellManagerGrid();
     void refreshAndRunDialog();
     //-- Spatial Calc
-
+    QGrid1D *testGrid;
 
 private slots:
 

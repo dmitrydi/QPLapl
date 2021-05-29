@@ -13,6 +13,8 @@
 #include <optional>
 #include <stdexcept>
 #include <QTextStream>
+#include "qgrid1d.h"
+#include <algorithm>
 
 #define CHECK_OPT_PARAM(opt_param, text) {  \
     if(!(opt_param)) {                      \
@@ -51,6 +53,8 @@ const QHash<QString, DrainageArea> mapStrToGDrainageArea = {
 
 using DataPoint = std::pair<double, double>;
 
+const double small_dbl = 1e-4;
+
 class ParamKeeper {
 public:
     ParamKeeper() {};
@@ -64,6 +68,7 @@ public:
     std::optional<UNITSYSTEM> usys;
     std::optional<CALCMODE> clcm;
     const QStandardItemModel *tpqmodel;
+    const QStandardItemModel *tgridmodel; // grid schedule
     double xed() const;
     double xwd() const;
     double yed() const;
@@ -74,13 +79,22 @@ public:
     double hd() const;
     double fcd() const;
     Boundary boundary() const;
-    std::vector<double> GetTPQ() const;
+    std::vector<double> GetTs(const QStandardItemModel *model) const;
+    std::vector<double> GetTGrid() const; // grid schedule
     std::vector<double> GetTds(const std::vector<double>& ts) const;
     std::vector<double> GetPQ(const std::vector<double>& vals) const;
     std::vector<double> GetP(const std::vector<double>& pds) const;
     std::vector<double> GetQ(const std::vector<double>& qds) const;
-private:
+    std::vector<double> GetGridX() const;
+    std::vector<double> GetGridY() const;
+    std::vector<double> GetGridZ() const;
+    std::optional<GridSettings> nxLeft, nxWell, nxRight;
+    std::optional<GridSettings> nyBottom, nyWell, nyTop;
+    std::optional<GridSettings> nzBottom, nzTop;
+    void TransformToDimentionGrid(QList<Matrix3DV>&);
     double LRef() const;
+
+
 };
 
 class WellManager : public QObject
@@ -89,8 +103,9 @@ class WellManager : public QObject
 public:
 
     explicit WellManager(QObject *parent = nullptr);
+    ~WellManager();
     QVector<DataPoint> PQCalc(); // to be modified to take a QAbstractItemModel*
-    QList<Matrix3DV> GridCalc() const; // to be modified to take a QAbstractItemModel*
+    QList<Matrix3DV> GridCalc(); // to be modified to take a QAbstractItemModel*
     void setWellType(const QString&);
     void setBoundary(const QString&);
     void setDrainageArea(const QString&);
@@ -109,6 +124,7 @@ public:
     void setLh(const QString&);
     void setNFrac(const QString&);
     void setTSchedule(const QStandardItemModel*);
+    void setGridSchedule(const QStandardItemModel *m);
     void setQ(const QString&);
     void setP(const QString&);
     void setPinit(const QString&);
@@ -118,6 +134,16 @@ public:
     void setMu(const QString&);
     void setBoil(const QString&);
     void setCt(const QString&);
+    //
+    void SetNxLeft(const GridSettings settings);
+    void SetNxWell(const GridSettings settings);
+    void SetNxRight(const GridSettings settings);
+    void SetNyBottom(const GridSettings settings);
+    void SetNyTop(const GridSettings settings);
+    void SetNyWell(const GridSettings settings);
+    void SetNzBottom(const GridSettings settings);
+    void SetNzTop(const GridSettings settings);
+    //
     void PrintParams(QTextStream&) const;
 signals:
     void WellIsSet(bool);
