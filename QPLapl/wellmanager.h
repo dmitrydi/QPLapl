@@ -91,6 +91,7 @@ public:
     std::optional<GridSettings> nxLeft, nxWell, nxRight;
     std::optional<GridSettings> nyBottom, nyWell, nyTop;
     std::optional<GridSettings> nzBottom, nzTop;
+    std::optional<GridSettings> nxBetween, nyBetween;
     void TransformToDimentionGrid(QList<Matrix3DV>&);
     double LRef() const;
 
@@ -143,6 +144,8 @@ public:
     void SetNyWell(const GridSettings settings);
     void SetNzBottom(const GridSettings settings);
     void SetNzTop(const GridSettings settings);
+    void SetNxBetween(const GridSettings settings);
+    void SetNyBetween(const GridSettings settings);
     //
     void PrintParams(QTextStream&) const;
 signals:

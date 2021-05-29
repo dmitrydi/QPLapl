@@ -22,11 +22,14 @@ MainWindow::MainWindow(QWidget *parent)
     setupCalcModeLabels();
     SetupPQSchedule();
     SetupGridSchedule();
+    SetupGrids();
     connect(this, &MainWindow::PQDataCalculated, graphWin, &PQGraphWindow::FillData);
     connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
 
     connect(this, &MainWindow::GridCalculated, gridWin, &GridGraphWindow::FillData);
     connect(gridWin, &GridGraphWindow::SaveData, this, &MainWindow::SaveGridData);
+
+    qDebug() << ui->gridLayout->itemAt(0)->widget()->minimumHeight();
 
     //-------
 //    testGrid = new QGrid1D("Nx", LogDirection::MaxToMin);
@@ -64,6 +67,36 @@ void MainWindow::runWellManagerGrid() {
     setWellManagerData();
     GridData = wellManager->GridCalc();
     emit GridCalculated(GridData);
+}
+
+void MainWindow::SetupGrids()
+{
+    gNxLeft = new QGrid1D("Nx left", LogDirection::MaxToMin);
+    gNxWell = new QGrid1D("Nx well", LogDirection::MinToMax);
+    gNxRight = new QGrid1D("Nx right", LogDirection::MinToMax);
+    gNyBottom = new QGrid1D("Ny bottom", LogDirection::MaxToMin);
+    gNyTop = new QGrid1D("Ny top", LogDirection::MinToMax);
+    gNyWell = new QGrid1D("Ny well", LogDirection::MinToMax);
+    gNzBottom = new QGrid1D("Nz bottom", LogDirection::MaxToMin);
+    gNzTop = new QGrid1D("Nz top", LogDirection::MinToMax);
+    gNxBetween = new QGrid1D("Nx between", LogDirection::MinToMax);
+    gNyBetween = new QGrid1D("Ny between", LogDirection::MinToMax);
+
+    ui->gridLayout->setSpacing(0);
+    ui->gridLayout->setContentsMargins(0,0,0,0);
+
+    ui->gridLayout->addWidget(gNxLeft);
+    ui->gridLayout->addWidget(gNxWell);
+    ui->gridLayout->addWidget(gNxRight);
+    ui->gridLayout->addWidget(gNyBottom);
+    ui->gridLayout->addWidget(gNyTop);
+    ui->gridLayout->addWidget(gNzBottom);
+    ui->gridLayout->addWidget(gNzTop);
+    ui->gridLayout->addWidget(gNxBetween);
+    ui->gridLayout->addWidget(gNyBetween);
+    ui->gridLayout->insertStretch(-1,1);
+    gNyWell->hide();
+
 }
 
 void MainWindow::SavePQData()
@@ -367,4 +400,15 @@ void MainWindow::setWellManagerData() {
     wellManager->setMu(ui->lineEditMu->text());
     wellManager->setBoil(ui->lineEditBoil->text());
     wellManager->setCt(ui->lineEditCt->text());
+    // setup grid
+    wellManager->SetNxLeft(gNxLeft->GetGridSettings());
+    wellManager->SetNxWell(gNxWell->GetGridSettings());
+    wellManager->SetNxRight(gNxRight->GetGridSettings());
+    wellManager->SetNyBottom(gNyBottom->GetGridSettings());
+    wellManager->SetNyTop(gNyTop->GetGridSettings());
+    wellManager->SetNyWell(gNyWell->GetGridSettings());
+    wellManager->SetNzBottom(gNzBottom->GetGridSettings());
+    wellManager->SetNzTop(gNzTop->GetGridSettings());
+    wellManager->SetNxBetween(gNxBetween->GetGridSettings());
+    wellManager->SetNyBetween(gNyBetween->GetGridSettings());
 }

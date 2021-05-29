@@ -67,6 +67,8 @@ RESOURCES += Vertical.jpg \
 INCLUDEPATH += \
     C:/mingw64/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include
 
+QMAKE_CXXFLAGS_DEBUG += -O2
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

@@ -1,4 +1,5 @@
 #include "qgrid1d.h"
+#include <QDebug>
 
 QGrid1D::QGrid1D(const QString& varTitle, LogDirection direction, QWidget *parent): QWidget(parent)
                                                             , direction(direction)
@@ -13,11 +14,12 @@ QGrid1D::QGrid1D(const QString& varTitle, LogDirection direction, QWidget *paren
     LinLogBox = new QComboBox();
     hLayout->addWidget(LinLogBox);
     LinLogBox->addItems(gridType);
+    //this->setMinimumHeight(100);
 }
 
 GridSettings QGrid1D::GetGridSettings() const {
     int nsteps = lineEdit->text().toInt();
-    Q_ASSERT(nsteps > 0);
+    //Q_ASSERT(nsteps > 0);
     if (LinLogBox->currentText() == "Lin") {
         return {QGridType::Lin, nsteps, std::nullopt};
     } else if (LinLogBox->currentText() == "Log") {

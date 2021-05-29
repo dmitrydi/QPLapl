@@ -16,6 +16,7 @@
 #include "tablewellschedule.h"
 #include "qgrid1d.h"
 #include "gridgraphwindow.h"
+#include <QSpacerItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -91,6 +92,11 @@ private:
     void refreshAndRunDialog();
     //-- Spatial Calc
     QGrid1D *testGrid;
+    void SetupGrids();
+    QGrid1D *gNxLeft, *gNxWell, *gNxRight;
+    QGrid1D *gNyBottom, *gNyTop, *gNyWell;
+    QGrid1D *gNzBottom, *gNzTop;
+    QGrid1D *gNxBetween, *gNyBetween;
 
 private slots:
 
