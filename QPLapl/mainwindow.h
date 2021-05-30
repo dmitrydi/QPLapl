@@ -15,7 +15,7 @@
 #include <QTextStream>
 #include "tablewellschedule.h"
 #include "qgrid1d.h"
-#include "gridgraphwindow.h"
+#include "gridplot.h"
 #include <QSpacerItem>
 
 QT_BEGIN_NAMESPACE
@@ -40,7 +40,7 @@ private:
     friend class MainWindowData;
     Ui::MainWindow *ui;
     PQGraphWindow *graphWin;
-    GridGraphWindow *gridWin;
+    GridPlot *gridWin;
     UniComboBox *uComboUnits;
     UniComboBox *uComboWellType;
     UniComboBox *uComboAreaShape;

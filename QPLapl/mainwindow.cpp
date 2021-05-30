@@ -5,7 +5,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , graphWin(new PQGraphWindow(this))
-    , gridWin(new GridGraphWindow(this))
+    , gridWin(new GridPlot(this))
 {
     ui->setupUi(this);
     wellManager = new WellManager(this);
@@ -26,15 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::PQDataCalculated, graphWin, &PQGraphWindow::FillData);
     connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
 
-    connect(this, &MainWindow::GridCalculated, gridWin, &GridGraphWindow::FillData);
-    connect(gridWin, &GridGraphWindow::SaveData, this, &MainWindow::SaveGridData);
+    connect(this, &MainWindow::GridCalculated, gridWin, &GridPlot::FillData);
+    connect(gridWin, &GridPlot::SaveData, this, &MainWindow::SaveGridData);
 
-    qDebug() << ui->gridLayout->itemAt(0)->widget()->minimumHeight();
-
-    //-------
-//    testGrid = new QGrid1D("Nx", LogDirection::MaxToMin);
-//    ui->testLayout->addWidget(testGrid);
-    //-------
 }
 
 void MainWindow::SetupPQSchedule() {
@@ -48,7 +42,7 @@ void MainWindow::SetupGridSchedule() {
     GridSchedule = new TableWellSchedule(uComboUnits, uComboCalcMode, ui->lineEditLiquidRate, ui->lineEditWellborePressure);
     ui->GridSchedLayout->addWidget(GridSchedule);
     connect(GridSchedule, &TableWellSchedule::ButtonCalculatePressed, this, &MainWindow::runWellManagerGrid);
-    connect(GridSchedule, &TableWellSchedule::ButtonShowPressed, gridWin, &GridGraphWindow::ShowGraph);
+    connect(GridSchedule, &TableWellSchedule::ButtonShowPressed, gridWin, &GridPlot::ShowGraph);
     connect(GridSchedule, &TableWellSchedule::ButtonSavePressed, this, &MainWindow::SaveGridData);
 }
 

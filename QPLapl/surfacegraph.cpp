@@ -7,7 +7,7 @@
 
 using namespace QtDataVisualization;
 
-SurfaceGraph::SurfaceGraph(Q3DSurface *surface, Matrix3DV *matr_ptr)
+SurfaceGraph::SurfaceGraph(Q3DSurface *surface, const Matrix3DV *matr_ptr)
     : m_graph(surface)
 {
     m_graph->setAxisX(new QValue3DAxis);
@@ -27,7 +27,7 @@ SurfaceGraph::~SurfaceGraph()
     delete m_graph;
 }
 
-void SurfaceGraph::fillMatrixProxy(Matrix3DV *matr_ptr) {
+void SurfaceGraph::fillMatrixProxy(const Matrix3DV *matr_ptr) {
     auto xs = matr_ptr->GetAxis(MatrixAxis::X);
     auto ys = matr_ptr->GetAxis(MatrixAxis::Y);
     xMin = static_cast<float>(*std::min_element(begin(xs), end(xs)));

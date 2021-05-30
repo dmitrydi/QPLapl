@@ -15,7 +15,7 @@ class SurfaceGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit SurfaceGraph(Q3DSurface *surface, Matrix3DV* matr_ptr);
+    explicit SurfaceGraph(Q3DSurface *surface, const Matrix3DV* matr_ptr);
     ~SurfaceGraph();
 
     void enableMatrixModel(bool enable);
@@ -63,7 +63,7 @@ private:
 
     void setAxisXRange(float min, float max);
     void setAxisZRange(float min, float max);
-    void fillMatrixProxy(Matrix3DV* matr_ptr);
+    void fillMatrixProxy(const Matrix3DV* matr_ptr);
 };
 
 #endif // SURFACEGRAPH_H

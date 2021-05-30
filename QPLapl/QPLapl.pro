@@ -14,7 +14,7 @@ QT += widgets \
 
 SOURCES += \
     chbessel.cpp \
-    gridgraphwindow.cpp \
+    gridplot.cpp \
     gwell.cpp \
     interp_1d.cpp \
     linlogaxis.cpp \
@@ -35,7 +35,7 @@ SOURCES += \
 HEADERS += \
     auxillary.h \
     chbessel.h \
-    gridgraphwindow.h \
+    gridplot.h \
     gwell.h \
     interp_1d.h \
     labelmapper.h \

@@ -49,16 +49,14 @@ QList<Matrix3DV> WellManager::GridCalc() {
     std::vector<double> xds = pk.GetGridX();
     std::vector<double> yds = pk.GetGridY();
     std::vector<double> zds = pk.GetGridZ();
-    qDebug() << tds;
-    qDebug() << xds;
-    qDebug() << yds;
-    qDebug() << zds;
+//    qDebug() << tds;
+//    qDebug() << xds;
+//    qDebug() << yds;
+//    qDebug() << zds;
     for (const auto& td: tds) {
-        qDebug() << td;
         ans.push_back(well->pd_m_parallel(td, 4, xds, yds, zds));
-        std::cerr << ans[ans.size()-1];
     }
-    //pk.TransformToDimentionGrid(ans);
+    pk.TransformToDimentionGrid(ans);
     return ans;
 }
 
