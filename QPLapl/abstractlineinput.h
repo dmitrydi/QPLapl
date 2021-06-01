@@ -108,10 +108,10 @@ signals:
     void VisibilityControllerChanged(const QString&);
 };
 
-class TexComboLineInput: public AbstractControlledHidable {
+class TextComboLineInput: public AbstractControlledHidable {
     Q_OBJECT
 public:
-    TexComboLineInput(const QString& title,
+    TextComboLineInput(const QString& title,
                       const QList<QString>& comboItems = {},
                       AbstractLineInput const *visibilityController = nullptr,
                       const QHash<QString, VisibilityState>& mapVisibilityController = {},

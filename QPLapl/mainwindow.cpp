@@ -10,6 +10,111 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     wellManager = new WellManager(this);
     ui->tabWidget->setCurrentIndex(0);
+
+    // setup layoutUnits
+    unitsInput = new ComboLineinput("Units");
+    unitsInput->AddComboItems(Units::Units);
+    ui->layoutUnits->addWidget(unitsInput);
+    ui->layoutUnits->addStretch(1);
+
+    // setup layoutFulidRock
+    ui->layoutFluidRock->setContentsMargins(0,0,0,0);
+    permInput = new TextLineInput("Permeability", unitsInput, Units::Maps::Permeability);
+    ui->layoutFluidRock->addWidget(permInput);
+
+    payInput = new TextLineInput("Pay zone", unitsInput, Units::Maps::PayZone);
+    ui->layoutFluidRock->addWidget(payInput);
+
+    poroInput = new TextLineInput("Porosity", unitsInput, Units::Maps::Porosity);
+    ui->layoutFluidRock->addWidget(poroInput);
+
+    viscInput = new TextLineInput("Viscosity", unitsInput, Units::Maps::Viscosity);
+    ui->layoutFluidRock->addWidget(viscInput);
+
+    ctInput = new TextLineInput("Total Compressibility", unitsInput, Units::Maps::Ct);
+    ui->layoutFluidRock->addWidget(ctInput);
+
+    fvfInput = new TextLineInput("Formation Volume Factor", unitsInput, Units::Maps::FVF);
+    ui->layoutFluidRock->addWidget(fvfInput);
+
+    pinitInput = new TextLineInput("Initial Formation Pressure", unitsInput, Units::Maps::Pinit);
+    ui->layoutFluidRock->addWidget(pinitInput);
+
+    ui->layoutFluidRock->addStretch(1);
+
+    // setup layoutWellProps
+    welltypeInput = new ComboLineinput("Well Type");
+    welltypeInput->AddComboItems(WellTypes::WellTypes);
+    ui->layoutWellProps->addWidget(welltypeInput);
+
+    xfInput = new TextLineInput("Fracture Half-Length", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::xfVisibility);
+    ui->layoutWellProps->addWidget(xfInput);
+
+    fcdInput = new TextLineInput("Fracture Conductivity", unitsInput, Units::Maps::DimentionlessConductivity, welltypeInput, WellTypes::Maps::fcdVisibility);
+    ui->layoutWellProps->addWidget(fcdInput);
+
+    lhInput = new TextLineInput("Horizontal Well Length", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::lhVisibility);
+    ui->layoutWellProps->addWidget(lhInput);
+
+    nfracInput = new TextLineInput("Number of Fractures", unitsInput, Units::Maps::Count, welltypeInput, WellTypes::Maps::nfracVisibility);
+    ui->layoutWellProps->addWidget(nfracInput);
+
+    rwInput = new TextLineInput("Well Radius", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::rwVisibility);
+    ui->layoutWellProps->addWidget(rwInput);
+
+    ui->layoutWellProps->addStretch(1);
+
+    // setup layoutDrainageProps
+    areashapeInput = new ComboLineinput("Area Shape");
+    areashapeInput->AddComboItems(AreaShapes::AreaShapes);
+    ui->layoutDrainageProps->addWidget(areashapeInput);
+
+    xeInput = new TextLineInput("Xe", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xeVisibility);
+    ui->layoutDrainageProps->addWidget(xeInput);
+
+    yeInput = new TextLineInput("Ye", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xeVisibility);
+    ui->layoutDrainageProps->addWidget(yeInput);
+
+    xwInput = new TextLineInput("Xw", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xwVisibility);
+    ui->layoutDrainageProps->addWidget(xwInput);
+
+    ywInput = new TextLineInput("Yw", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::ywVisibility);
+    ui->layoutDrainageProps->addWidget(ywInput);
+
+    zwInput = new TextLineInput("Zw", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::zwVisibility);
+    ui->layoutDrainageProps->addWidget(zwInput);
+
+    reInput = new TextLineInput("Re", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::reVisibility);
+    ui->layoutDrainageProps->addWidget(reInput);
+
+    boundaryInput = new ComboLineinput("Boundary Conditions");
+    boundaryInput->AddComboItems(BoundaryTypes::BoundaryTypes);
+    ui->layoutDrainageProps->addWidget(boundaryInput);
+
+    ui->layoutDrainageProps->addStretch(1);
+
+    // setup layoutRegime
+    regimeInput = new ComboLineinput("Regime");
+    regimeInput->AddComboItems(WellRegimes::WellRegimes);
+    ui->layoutRegime->addWidget(regimeInput);
+
+    liqrateInput = new TextLineInput("Liquid Rate", unitsInput, Units::Maps::LiquidRate, regimeInput, WellRegimes::Maps::liqrateVisibility);
+    ui->layoutRegime->addWidget(liqrateInput);
+
+    wellpresInput = new TextLineInput("Wellbore Pressure", unitsInput, Units::Maps::Pressure, regimeInput, WellRegimes::Maps::wellpresVisibility);
+    ui->layoutRegime->addWidget(wellpresInput);
+
+    ui->layoutRegime->addStretch(1);
+    /*
+     *     // new objects
+
+    // tab Schedule
+    ComboLineinput *regimeInput;
+    TextLineInput *liqrateInput;
+    TextLineInput *wellpresInput;
+    //
+
+    */
     setupUComboUnits();
     setupUComboWellType();
     setupUComboAeaShape();
@@ -120,8 +225,7 @@ void MainWindow::testAbstractLineInput()
     textLine->SetUnitsMinWidth(40);
     ui->testLayoutReciever->addWidget(textLine);
 
-    comboLineInput = new TexComboLineInput("Nx", {"Lin", "Log"}, comboVisible, mapVisible);
-    ui->testLayoutReciever->addWidget(comboLineInput);
+
 }
 
 void MainWindow::SavePQData()

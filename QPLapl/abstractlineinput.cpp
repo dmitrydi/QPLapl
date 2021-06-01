@@ -11,9 +11,11 @@ AbstractControlledHidable::AbstractControlledHidable(const AbstractControlledHid
 {
     if (visibilityController) {
         connect(visibilityController, &AbstractControlledHidable::VisibilityControllerChanged, this, &AbstractControlledHidable::onVisibilityControllerChanged);
+    } else {
+        //this->setVisible(true);
     }
     if (mapVisibilityController.isEmpty()) {
-        this->setVisible(true);
+        //this->setVisible(true);
     } else {
         onVisibilityControllerChanged(visibilityController->CurrentText());
     }
@@ -60,6 +62,7 @@ AbstractLineInput::AbstractLineInput(const QString& title,
     mainLayout->addWidget(title_ptr);
     mainLayout->addWidget(blankWidget);
     mainLayout->addWidget(units_ptr);
+    mainLayout->setContentsMargins(0,1,0,1);
 
     if (unitsController) {
         connect(unitsController, &AbstractLineInput::UnitsControllerChanged, this, &AbstractLineInput::onUnitsControllerChanged);
@@ -172,7 +175,7 @@ void ComboLineinput::AddComboItems(const QList<QString> & texts)
 }
 
 
-TexComboLineInput::TexComboLineInput(const QString &title,
+TextComboLineInput::TextComboLineInput(const QString &title,
                                      const QList<QString> &comboItems_,
                                      const AbstractLineInput *visibilityController,
                                      const QHash<QString, VisibilityState> &mapVisibilityController,
@@ -187,6 +190,7 @@ TexComboLineInput::TexComboLineInput(const QString &title,
         comboItems.append(it);
     }
     this->setLayout(layout_ptr);
+    layout_ptr->setContentsMargins(0,0,0,0);
     layout_ptr->addWidget(title_ptr);
     layout_ptr->addWidget(line_ptr);
     layout_ptr->addWidget(box_ptr);
@@ -194,34 +198,34 @@ TexComboLineInput::TexComboLineInput(const QString &title,
     connect(line_ptr, &QLineEdit::textChanged, this, &AbstractControlledHidable::VisibilityControllerChanged);
 }
 
-const QString TexComboLineInput::CurrentText() const
+const QString TextComboLineInput::CurrentText() const
 {
     return line_ptr->text();
 }
 
-const QString TexComboLineInput::ComboText() const
+const QString TextComboLineInput::ComboText() const
 {
     return box_ptr->currentText();
 }
 
-void TexComboLineInput::AddComboItem(const QString & item)
+void TextComboLineInput::AddComboItem(const QString & item)
 {
     comboItems.append(item);
     box_ptr->addItem(item);
 }
 
-void TexComboLineInput::SetValidator(const QValidator *validator)
+void TextComboLineInput::SetValidator(const QValidator *validator)
 {
     line_ptr->setValidator(validator);
 }
 
-void TexComboLineInput::SetTitleMinWidth(int width)
+void TextComboLineInput::SetTitleMinWidth(int width)
 {
     title_ptr->setMinimumWidth(width);
     title_ptr->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred);
 }
 
-void TexComboLineInput::SetUnitsMinWidth(int width)
+void TextComboLineInput::SetUnitsMinWidth(int width)
 {
     box_ptr->setMinimumWidth(width);
     box_ptr->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred);

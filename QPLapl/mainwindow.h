@@ -39,6 +39,8 @@ public slots:
     void SavePQData();
     void SaveGridData();
 private:
+
+
     friend class MainWindowData;
     Ui::MainWindow *ui;
     PQGraphWindow *graphWin;
@@ -103,7 +105,38 @@ private:
     TextLineInput *textLine;
     ComboLineinput *comboLine;
     ComboLineinput *comboVisible;
-    TexComboLineInput *comboLineInput;
+
+    // new objects
+    // tab Units
+    ComboLineinput *unitsInput;
+    // tab Fluid and Rock
+    TextLineInput *permInput;
+    TextLineInput *payInput;
+    TextLineInput *poroInput;
+    TextLineInput *viscInput;
+    TextLineInput *ctInput;
+    TextLineInput *fvfInput;
+    TextLineInput *pinitInput;
+    // tab Well and Drainage Area
+    ComboLineinput *welltypeInput;
+    TextLineInput *xfInput;
+    TextLineInput *fcdInput;
+    TextLineInput *lhInput;
+    TextLineInput *nfracInput;
+    TextLineInput *rwInput;
+    ComboLineinput *areashapeInput;
+    TextLineInput *xeInput;
+    TextLineInput *yeInput;
+    TextLineInput *xwInput;
+    TextLineInput *ywInput;
+    TextLineInput *zwInput;
+    TextLineInput *reInput;
+    ComboLineinput *boundaryInput;
+    // tab Schedule
+    ComboLineinput *regimeInput;
+    TextLineInput *liqrateInput;
+    TextLineInput *wellpresInput;
+    //
 private slots:
 
 
