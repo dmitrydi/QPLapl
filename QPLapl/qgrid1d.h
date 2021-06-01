@@ -43,7 +43,7 @@ class QGrid1D : public QWidget
 public:
     explicit QGrid1D(const QString& varTitle, LogDirection direction, QWidget *parent = nullptr);
     GridSettings GetGridSettings() const;
-private:
+//private:
     LogDirection direction;
     QString varTitle;
     QHBoxLayout *hLayout;

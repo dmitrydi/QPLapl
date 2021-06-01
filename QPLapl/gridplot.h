@@ -15,6 +15,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QScreen>
+#include <QComboBox>
 #include "surfacegraph.h"
 #include "matrix3dv.h"
 
@@ -23,9 +24,6 @@ class GridPlot : public QDialog
     Q_OBJECT
 public:
     explicit GridPlot(QWidget *parent = nullptr);
-    ~GridPlot() {
-        if (modifier) delete modifier;
-    }
 public slots:
     void FillData(const QList<Matrix3DV>&);
     void ShowGraph();
@@ -53,6 +51,8 @@ private:
     void SetContainerProps();
     void SetRbs();
     void SetSliders();
+    void SetTimeBox();
+    QComboBox *timeBox;
 };
 
 #endif // GRIDPLOT_H

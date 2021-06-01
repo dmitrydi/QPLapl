@@ -28,7 +28,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::GridCalculated, gridWin, &GridPlot::FillData);
     connect(gridWin, &GridPlot::SaveData, this, &MainWindow::SaveGridData);
-
+    QList<QGrid1D*> gridWidgets = this->findChildren<QGrid1D*>();
+    if (!gridWidgets.isEmpty()) {
+        for (int i = 0; i < gridWidgets.size(); ++i) {
+            auto curWidget = gridWidgets.at(i);
+            qDebug() << curWidget->titleLabel->text() << " " << curWidget->titleLabel->sizeHint() << " " << curWidget->titleLabel->sizePolicy() ;
+        }
+    } else {
+        qDebug() << "No gridWidgets in MianWindow";
+    }
+    testAbstractLineInput();
 }
 
 void MainWindow::SetupPQSchedule() {
@@ -91,6 +100,28 @@ void MainWindow::SetupGrids()
     ui->gridLayout->insertStretch(-1,1);
     gNyWell->hide();
 
+}
+
+void MainWindow::testAbstractLineInput()
+{
+    comboLine = new ComboLineinput("Unit System");
+    ui->testLayoutController->addWidget(comboLine);
+    comboLine->AddComboItems(Units::Units);
+
+    comboVisible = new ComboLineinput("Visibility");
+    comboVisible->AddComboItem("Visible");
+    comboVisible->AddComboItem("Invisible");
+    QHash<QString, VisibilityState> mapVisible = {{"Visible", VisibilityState::Visible}, {"Invisible", VisibilityState::Invisible}};
+    ui->testLayoutController->addWidget(comboVisible);
+
+    textLine = new TextLineInput("perm", comboLine, Units::Maps::Permeability, comboVisible, mapVisible);
+    textLine->SetDefaultUnits("custom");
+    textLine->SetTitleMinWidth(10);
+    textLine->SetUnitsMinWidth(40);
+    ui->testLayoutReciever->addWidget(textLine);
+
+    comboLineInput = new TexComboLineInput("Nx", {"Lin", "Log"}, comboVisible, mapVisible);
+    ui->testLayoutReciever->addWidget(comboLineInput);
 }
 
 void MainWindow::SavePQData()

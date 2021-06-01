@@ -17,6 +17,8 @@
 #include "qgrid1d.h"
 #include "gridplot.h"
 #include <QSpacerItem>
+#include "abstractlineinput.h"
+#include "interfacemaps.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -97,7 +99,11 @@ private:
     QGrid1D *gNyBottom, *gNyTop, *gNyWell;
     QGrid1D *gNzBottom, *gNzTop;
     QGrid1D *gNxBetween, *gNyBetween;
-
+    void testAbstractLineInput();
+    TextLineInput *textLine;
+    ComboLineinput *comboLine;
+    ComboLineinput *comboVisible;
+    TexComboLineInput *comboLineInput;
 private slots:
 
 

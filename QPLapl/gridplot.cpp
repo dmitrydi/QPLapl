@@ -18,6 +18,7 @@ GridPlot::GridPlot(QWidget *parent) :
       , axisMaxSliderX(new QSlider(Qt::Horizontal, widget))
       , axisMinSliderZ(new QSlider(Qt::Horizontal, widget))
       , axisMaxSliderZ(new QSlider(Qt::Horizontal, widget))
+      , timeBox(new QComboBox(widget))
       //, modifier(new SurfaceGraph(graph, &grid))
 {
     SetContainerProps();
@@ -26,6 +27,7 @@ GridPlot::GridPlot(QWidget *parent) :
     vLayout->setAlignment(Qt::AlignTop);
     SetRbs();
     SetSliders();
+    SetTimeBox();
     this->setLayout(hLayout);
 }
 
@@ -113,4 +115,11 @@ void GridPlot::SetSliders() {
     vLayout->addWidget(new QLabel(QStringLiteral("Row range")));
     vLayout->addWidget(axisMinSliderZ);
     vLayout->addWidget(axisMaxSliderZ);
+}
+
+void GridPlot::SetTimeBox()
+{
+    vLayout->addWidget(new QLabel(QStringLiteral("Time step")));
+    timeBox->addItems({"1", "2", "3"});
+    vLayout->addWidget(timeBox);
 }

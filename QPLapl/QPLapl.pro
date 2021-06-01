@@ -13,6 +13,7 @@ QT += widgets \
       datavisualization
 
 SOURCES += \
+    abstractlineinput.cpp \
     chbessel.cpp \
     gridplot.cpp \
     gwell.cpp \
@@ -33,10 +34,12 @@ SOURCES += \
     picmanager.cpp
 
 HEADERS += \
+    abstractlineinput.h \
     auxillary.h \
     chbessel.h \
     gridplot.h \
     gwell.h \
+    interfacemaps.h \
     interp_1d.h \
     labelmapper.h \
     linlogaxis.h \

@@ -7,6 +7,9 @@ QGrid1D::QGrid1D(const QString& varTitle, LogDirection direction, QWidget *paren
                                                             , hLayout(new QHBoxLayout(this))
 {
     titleLabel = new QLabel();
+    titleLabel->setMinimumWidth(58);
+    titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    hLayout->setContentsMargins(0,5,0,5);
     hLayout->addWidget(titleLabel);
     titleLabel->setText(varTitle);
     lineEdit = new QLineEdit();
@@ -14,7 +17,6 @@ QGrid1D::QGrid1D(const QString& varTitle, LogDirection direction, QWidget *paren
     LinLogBox = new QComboBox();
     hLayout->addWidget(LinLogBox);
     LinLogBox->addItems(gridType);
-    //this->setMinimumHeight(100);
 }
 
 GridSettings QGrid1D::GetGridSettings() const {
