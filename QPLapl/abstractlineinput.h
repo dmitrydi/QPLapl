@@ -19,7 +19,8 @@ public:
                          const QHash<QString, VisibilityState>& mapVisibilityController = {},
                          QWidget *parent = nullptr);
     void AddVisibilityDependency(const QString& controllerState, VisibilityState visState);
-    void SetVisibilityController(AbstractControlledHidable const *visibilityController);
+    void AddVisibilityMap(const QHash<QString, VisibilityState>& aMap);
+    void AddVisibilityController(const AbstractControlledHidable* controller);
     virtual const QString CurrentText() const = 0;
     virtual void SetTitleMinWidth(int width) = 0;
     virtual void SetUnitsMinWidth(int width) = 0;
@@ -27,7 +28,8 @@ public:
     virtual int GetUnitsWidth() const = 0;
     virtual ~AbstractControlledHidable() = default;
 protected:
-    AbstractControlledHidable const *visibilityController;
+    QList<const AbstractControlledHidable *> controllers;
+    //AbstractControlledHidable const *visibilityController;
     QHash<QString, VisibilityState> mapVisibilityController;
 public slots:
     void onVisibilityControllerChanged(const QString& value);

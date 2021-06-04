@@ -71,22 +71,74 @@ const QHash<QString, VisibilityState> zwVisibility = {
     {"Vertical", VisibilityState::Invisible}
 };
 
-const QHash<QString, VisibilityState> nxLeftVisibility = {
+const QHash<QString, VisibilityState> nLeftVisibility = {
+    {"Fractured", VisibilityState::Visible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Visible}
+};
 
+const QHash<QString, VisibilityState> nRightVisibility = {
+    {"Fractured", VisibilityState::Visible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Visible}
+};
+
+const QHash<QString, VisibilityState> nBottomVisibility = {
+    {"Fractured", VisibilityState::Visible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Visible}
+};
+
+const QHash<QString, VisibilityState> nTopVisibility = {
+    {"Fractured", VisibilityState::Visible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Visible}
+};
+
+const QHash<QString, VisibilityState> nWellVisibility = {
+    {"Fractured", VisibilityState::Visible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Invisible}
+};
+
+const QHash<QString, VisibilityState> nzBottomVisibility = {
+    {"Fractured", VisibilityState::Invisible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Invisible},
+    {"Vertical", VisibilityState::Invisible}
+};
+
+const QHash<QString, VisibilityState> nzTopVisibility = {
+    {"Fractured", VisibilityState::Invisible},
+    {"Horizontal", VisibilityState::Visible},
+    {"Multifractured", VisibilityState::Invisible},
+    {"Vertical", VisibilityState::Invisible}
+};
+
+const QHash<QString, VisibilityState> nBetweenVisibility = {
+    {"Fractured", VisibilityState::Invisible},
+    {"Horizontal", VisibilityState::Invisible},
+    {"Multifractured", VisibilityState::Visible},
+    {"Vertical", VisibilityState::Invisible}
 };
 }
 }
 
 /*
- *     TextComboLineInput *nxLeftInput;
-    TextComboLineInput *nxRightInput;
+ *
+    TextComboLineInput *nLeftInput;
+    TextComboLineInput *nRightInput;
     TextComboLineInput *nBottomInput;
     TextComboLineInput *nTopwInput;
     TextComboLineInput *nWellInput;
     TextComboLineInput *nzBottomInput;
     TextComboLineInput *nzTopInput;
-    TextComboLineInput *nxBetweenInput;
-    TextComboLineInput *nyBetweenInput;
+    TextComboLineInput *nBetweenInput;
 */
 namespace AreaShapes {
 const QList<QString> AreaShapes = {"Rectangular", "Infinite", "Cricled"};
@@ -117,8 +169,46 @@ const QHash<QString, VisibilityState> reVisibility = {
     {"Infinite", VisibilityState::Invisible},
     {"Cricled", VisibilityState::Visible},
 };
-
-
+const QHash<QString, VisibilityState> nLeftVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Invisible},
+    {"Cricled", VisibilityState::Invisible},
+};
+const QHash<QString, VisibilityState> nRightVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Invisible},
+    {"Cricled", VisibilityState::Invisible},
+};
+const QHash<QString, VisibilityState> nBottomVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Invisible},
+    {"Cricled", VisibilityState::Invisible},
+};
+const QHash<QString, VisibilityState> nTopVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Invisible},
+    {"Cricled", VisibilityState::Invisible},
+};
+const QHash<QString, VisibilityState> nWellVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Visible},
+    {"Cricled", VisibilityState::Visible},
+};
+const QHash<QString, VisibilityState> nzBottomVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Visible},
+    {"Cricled", VisibilityState::Visible},
+};
+const QHash<QString, VisibilityState> nzTopVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Visible},
+    {"Cricled", VisibilityState::Visible},
+};
+const QHash<QString, VisibilityState> nBetweenVisibility = {
+    {"Rectangular", VisibilityState::Visible},
+    {"Infinite", VisibilityState::Visible},
+    {"Cricled", VisibilityState::Visible},
+};
 }
 }
 

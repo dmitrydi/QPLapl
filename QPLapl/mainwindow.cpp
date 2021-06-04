@@ -115,6 +115,56 @@ MainWindow::MainWindow(QWidget *parent)
     AlignLineInputs(ui->layoutRegime);
 
     // setup layoutGridSetup
+//    TextComboLineInput *nLeftInput;
+//    TextComboLineInput *nRightInput;
+//    TextComboLineInput *nBottomInput;
+//    TextComboLineInput *nTopInput;
+//    TextComboLineInput *nWellInput;
+//    TextComboLineInput *nzBottomInput;
+//    TextComboLineInput *nzTopInput;
+//    TextComboLineInput *nBetweenInput;
+    nLeftInput = new TextComboLineInput("N left", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nLeftVisibility);
+    nLeftInput->AddVisibilityController(areashapeInput);
+    nLeftInput->AddVisibilityMap(AreaShapes::Maps::nLeftVisibility);
+    ui->layoutGridSetup->addWidget(nLeftInput);
+
+    nRightInput = new TextComboLineInput("N right", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nRightVisibility);
+    nRightInput->AddVisibilityController(areashapeInput);
+    nRightInput->AddVisibilityMap(AreaShapes::Maps::nRightVisibility);
+    ui->layoutGridSetup->addWidget(nRightInput);
+
+    nBottomInput = new TextComboLineInput("N bottom", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nBottomVisibility);
+    nBottomInput->AddVisibilityController(areashapeInput);
+    nBottomInput->AddVisibilityMap(AreaShapes::Maps::nBottomVisibility);
+    ui->layoutGridSetup->addWidget(nBottomInput);
+
+    nTopInput = new TextComboLineInput("N top", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nTopVisibility);
+    nTopInput->AddVisibilityController(areashapeInput);
+    nTopInput->AddVisibilityMap(AreaShapes::Maps::nTopVisibility);
+    ui->layoutGridSetup->addWidget(nTopInput);
+
+    nWellInput = new TextComboLineInput("N Well", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nWellVisibility);
+    nWellInput->AddVisibilityController(areashapeInput);
+    nWellInput->AddVisibilityMap(AreaShapes::Maps::nWellVisibility);
+    ui->layoutGridSetup->addWidget(nWellInput);
+
+    nzBottomInput = new TextComboLineInput("Nz Bottom", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nzBottomVisibility);
+    nzBottomInput->AddVisibilityController(areashapeInput);
+    nzBottomInput->AddVisibilityMap(AreaShapes::Maps::nzBottomVisibility);
+    ui->layoutGridSetup->addWidget(nzBottomInput);
+
+    nzTopInput = new TextComboLineInput("Nz Top", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nzTopVisibility);
+    nzTopInput->AddVisibilityController(areashapeInput);
+    nzTopInput->AddVisibilityMap(AreaShapes::Maps::nzTopVisibility);
+    ui->layoutGridSetup->addWidget(nzTopInput);
+
+    nBetweenInput = new TextComboLineInput("N between", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nBetweenVisibility);
+    nBetweenInput->AddVisibilityController(areashapeInput);
+    nBetweenInput->AddVisibilityMap(AreaShapes::Maps::nBetweenVisibility);
+    ui->layoutGridSetup->addWidget(nBetweenInput);
+
+    ui->layoutGridSetup->addStretch(1);
+    //AlignLineInputs(ui->layoutGridSetup);
 
 
 

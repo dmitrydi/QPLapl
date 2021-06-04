@@ -6,20 +6,32 @@ AbstractControlledHidable::AbstractControlledHidable(const AbstractControlledHid
                                                      const QHash<QString, VisibilityState> &mapVisibilityController,
                                                      QWidget *parent):
     QWidget(parent)
-  , visibilityController(visibilityController)
   , mapVisibilityController(mapVisibilityController)
 {
-    if (visibilityController)
-        connect(visibilityController, &AbstractControlledHidable::VisibilityControllerChanged, this, &AbstractControlledHidable::onVisibilityControllerChanged);
+    if (visibilityController) {
+        controllers.append(visibilityController);
+        for (auto cnt: controllers)
+            connect(cnt,
+                    &AbstractControlledHidable::VisibilityControllerChanged,
+                    this,
+                    &AbstractControlledHidable::onVisibilityControllerChanged);
+    }
     CheckCurrentState();
 }
 
 void AbstractControlledHidable::CheckCurrentState() {
-    if (visibilityController && !mapVisibilityController.isEmpty()) {
-        const auto& state = visibilityController->CurrentText();
-        if (mapVisibilityController.contains(state) && (mapVisibilityController.value(state) == VisibilityState::Invisible))
-                this->hide();
+    bool needToHide = false;
+    for (auto cnt: controllers) {
+        if (!mapVisibilityController.isEmpty()) {
+            const auto& state = cnt->CurrentText();
+            if (mapVisibilityController.contains(state) && (mapVisibilityController.value(state) == VisibilityState::Invisible)) {
+                    needToHide = true;
+                    break;
+            }
+        }
     }
+    if (needToHide)
+        this->hide();
 }
 
 void AbstractControlledHidable::AddVisibilityDependency(const QString &controllerState, VisibilityState visState)
@@ -28,12 +40,21 @@ void AbstractControlledHidable::AddVisibilityDependency(const QString &controlle
     CheckCurrentState();
 }
 
-void AbstractControlledHidable::SetVisibilityController(const AbstractControlledHidable *visibilityController_)
+void AbstractControlledHidable::AddVisibilityMap(const QHash<QString, VisibilityState> &aMap)
 {
-    if (visibilityController)
-        disconnect(visibilityController);
-    visibilityController = visibilityController_;
-    connect(visibilityController, &AbstractControlledHidable::VisibilityControllerChanged, this, &AbstractControlledHidable::onVisibilityControllerChanged);
+    for (const auto& k: aMap.keys()) {
+        mapVisibilityController[k] = aMap.value(k);
+    }
+    CheckCurrentState();
+}
+
+void AbstractControlledHidable::AddVisibilityController(const AbstractControlledHidable *controller)
+{
+    controllers.append(controller);
+    connect(controller,
+            &AbstractControlledHidable::VisibilityControllerChanged,
+            this,
+            &AbstractControlledHidable::onVisibilityControllerChanged);
     CheckCurrentState();
 }
 
@@ -43,6 +64,7 @@ void AbstractControlledHidable::onVisibilityControllerChanged(const QString &val
         this->setVisible(mapVisibilityController.value(value) == VisibilityState::Visible);
     else
         this->setVisible((true));
+    CheckCurrentState();
 }
 
 

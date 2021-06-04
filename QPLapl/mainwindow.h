@@ -141,15 +141,14 @@ private:
     PQTView *wellSchedView;
     PQTView *gridSchedView;
 
-    TextComboLineInput *nxLeftInput;
-    TextComboLineInput *nxRightInput;
+    TextComboLineInput *nLeftInput;
+    TextComboLineInput *nRightInput;
     TextComboLineInput *nBottomInput;
-    TextComboLineInput *nTopwInput;
+    TextComboLineInput *nTopInput;
     TextComboLineInput *nWellInput;
     TextComboLineInput *nzBottomInput;
     TextComboLineInput *nzTopInput;
-    TextComboLineInput *nxBetweenInput;
-    TextComboLineInput *nyBetweenInput;
+    TextComboLineInput *nBetweenInput;
     //
 
     //test functions
