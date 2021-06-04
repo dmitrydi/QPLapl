@@ -9,21 +9,23 @@ AbstractControlledHidable::AbstractControlledHidable(const AbstractControlledHid
   , visibilityController(visibilityController)
   , mapVisibilityController(mapVisibilityController)
 {
-    if (visibilityController) {
+    if (visibilityController)
         connect(visibilityController, &AbstractControlledHidable::VisibilityControllerChanged, this, &AbstractControlledHidable::onVisibilityControllerChanged);
-    } else {
-        //this->setVisible(true);
-    }
-    if (mapVisibilityController.isEmpty()) {
-        //this->setVisible(true);
-    } else {
-        onVisibilityControllerChanged(visibilityController->CurrentText());
+    CheckCurrentState();
+}
+
+void AbstractControlledHidable::CheckCurrentState() {
+    if (visibilityController && !mapVisibilityController.isEmpty()) {
+        const auto& state = visibilityController->CurrentText();
+        if (mapVisibilityController.contains(state) && (mapVisibilityController.value(state) == VisibilityState::Invisible))
+                this->hide();
     }
 }
 
 void AbstractControlledHidable::AddVisibilityDependency(const QString &controllerState, VisibilityState visState)
 {
     mapVisibilityController[controllerState] = visState;
+    CheckCurrentState();
 }
 
 void AbstractControlledHidable::SetVisibilityController(const AbstractControlledHidable *visibilityController_)
@@ -32,6 +34,7 @@ void AbstractControlledHidable::SetVisibilityController(const AbstractControlled
         disconnect(visibilityController);
     visibilityController = visibilityController_;
     connect(visibilityController, &AbstractControlledHidable::VisibilityControllerChanged, this, &AbstractControlledHidable::onVisibilityControllerChanged);
+    CheckCurrentState();
 }
 
 void AbstractControlledHidable::onVisibilityControllerChanged(const QString &value)
@@ -99,6 +102,16 @@ void AbstractLineInput::SetUnitsMinWidth(int width)
     units_ptr->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 }
 
+int AbstractLineInput::GetTitleWidth() const
+{
+    return title_ptr->width();
+}
+
+int AbstractLineInput::GetUnitsWidth() const
+{
+    return units_ptr->width();
+}
+
 void AbstractLineInput::onUnitsControllerChanged(const QString &value)
 {
     if (mapUnitsController.contains(value))
@@ -137,6 +150,7 @@ TextLineInput::TextLineInput(const QString& title,
     delete blankWidget;
     connect(line_edit, &QLineEdit::textChanged, this, &AbstractLineInput::UnitsControllerChanged);
     connect(line_edit, &QLineEdit::textChanged, this, &AbstractControlledHidable::VisibilityControllerChanged);
+    connect(line_edit, &QLineEdit::textChanged, this, &AbstractLineInput::SendText);
 }
 
 const QString TextLineInput::CurrentText() const
@@ -157,6 +171,7 @@ ComboLineinput::ComboLineinput(const QString& title,
     delete blankWidget;
     connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractLineInput::UnitsControllerChanged);
     connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractControlledHidable::VisibilityControllerChanged);
+    connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractLineInput::SendText);
 }
 
 const QString ComboLineinput::CurrentText() const
@@ -229,4 +244,14 @@ void TextComboLineInput::SetUnitsMinWidth(int width)
 {
     box_ptr->setMinimumWidth(width);
     box_ptr->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred);
+}
+
+int TextComboLineInput::GetTitleWidth() const
+{
+    return title_ptr->width();
+}
+
+int TextComboLineInput::GetUnitsWidth() const
+{
+    return box_ptr->width();
 }

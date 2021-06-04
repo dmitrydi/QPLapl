@@ -19,6 +19,7 @@
 #include <QSpacerItem>
 #include "abstractlineinput.h"
 #include "interfacemaps.h"
+#include "pqtview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -136,7 +137,32 @@ private:
     ComboLineinput *regimeInput;
     TextLineInput *liqrateInput;
     TextLineInput *wellpresInput;
+
+    PQTView *wellSchedView;
+    PQTView *gridSchedView;
+
+    TextComboLineInput *nxLeftInput;
+    TextComboLineInput *nxRightInput;
+    TextComboLineInput *nBottomInput;
+    TextComboLineInput *nTopwInput;
+    TextComboLineInput *nWellInput;
+    TextComboLineInput *nzBottomInput;
+    TextComboLineInput *nzTopInput;
+    TextComboLineInput *nxBetweenInput;
+    TextComboLineInput *nyBetweenInput;
     //
+
+    //test functions
+    void TestPQTGetters() {
+        auto Ts = wellSchedView->GetTValues();
+        auto Ps = wellSchedView->GetPValues();
+        auto Qs = wellSchedView->GetQValues();
+        for (size_t i = 0; i < Ts.size(); ++i) {
+            qDebug() << Ts[i] << " " << Ps[i] << " " <<Qs[i];
+        }
+    }
+
+    void AlignLineInputs(QVBoxLayout *vLayout);
 private slots:
 
 

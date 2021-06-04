@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->layoutFluidRock->addStretch(1);
 
+    AlignLineInputs(ui->layoutFluidRock);
+
     // setup layoutWellProps
     welltypeInput = new ComboLineinput("Well Type");
     welltypeInput->AddComboItems(WellTypes::WellTypes);
@@ -63,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->layoutWellProps->addWidget(rwInput);
 
     ui->layoutWellProps->addStretch(1);
+
+    AlignLineInputs(ui->layoutWellProps);
 
     // setup layoutDrainageProps
     areashapeInput = new ComboLineinput("Area Shape");
@@ -93,6 +97,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->layoutDrainageProps->addStretch(1);
 
+    AlignLineInputs(ui->layoutDrainageProps);
+
     // setup layoutRegime
     regimeInput = new ComboLineinput("Regime");
     regimeInput->AddComboItems(WellRegimes::WellRegimes);
@@ -105,13 +111,45 @@ MainWindow::MainWindow(QWidget *parent)
     ui->layoutRegime->addWidget(wellpresInput);
 
     ui->layoutRegime->addStretch(1);
+
+    AlignLineInputs(ui->layoutRegime);
+
+    // setup layoutGridSetup
+
+
+
+    // setup Well Schedule
+    wellSchedView = new PQTView(
+                liqrateInput,
+                wellpresInput,
+                unitsInput,
+                Units::Maps::Time,
+                Units::Maps::LiquidRate,
+                Units::Maps::Pressure,
+                regimeInput,
+                WellRegimes::Maps::liqrateVisibility,
+                WellRegimes::Maps::wellpresVisibility);
+    ui->layoutWellSched->addWidget(wellSchedView);
+    gridSchedView = new PQTView(
+                liqrateInput,
+                wellpresInput,
+                unitsInput,
+                Units::Maps::Time,
+                Units::Maps::LiquidRate,
+                Units::Maps::Pressure,
+                regimeInput,
+                WellRegimes::Maps::liqrateVisibility,
+                WellRegimes::Maps::wellpresVisibility
+                );
+    ui->layoutGridSched->addWidget(gridSchedView);
+
+    //connect(wellSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::TestPQTGetters);
+
     /*
      *     // new objects
 
     // tab Schedule
-    ComboLineinput *regimeInput;
-    TextLineInput *liqrateInput;
-    TextLineInput *wellpresInput;
+
     //
 
     */
@@ -226,6 +264,29 @@ void MainWindow::testAbstractLineInput()
     ui->testLayoutReciever->addWidget(textLine);
 
 
+}
+
+void MainWindow::AlignLineInputs(QVBoxLayout *vLayout)
+{
+    int maxTitleWidth = 0, maxUnitsWidth = 0;
+    for (int i = 0; i < vLayout->count(); ++i) {
+        QWidget *w = vLayout->itemAt(i)->widget();
+        AbstractControlledHidable *h = dynamic_cast<AbstractControlledHidable*>(w);
+        if (h) {
+            if (h->GetTitleWidth() > maxTitleWidth)
+                maxTitleWidth = h->GetTitleWidth();
+            if (h->GetUnitsWidth() > maxUnitsWidth)
+                maxUnitsWidth = h->GetUnitsWidth();
+        }
+    }
+    for (int i = 0; i < vLayout->count(); ++i) {
+        QWidget *w = vLayout->itemAt(i)->widget();
+        AbstractControlledHidable *h = dynamic_cast<AbstractControlledHidable*>(w);
+        if (h) {
+            h->SetTitleMinWidth(maxTitleWidth);
+            h->SetUnitsMinWidth(maxUnitsWidth);
+        }
+    }
 }
 
 void MainWindow::SavePQData()

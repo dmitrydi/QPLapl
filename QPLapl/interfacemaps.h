@@ -70,9 +70,24 @@ const QHash<QString, VisibilityState> zwVisibility = {
     {"Multifractured", VisibilityState::Invisible},
     {"Vertical", VisibilityState::Invisible}
 };
+
+const QHash<QString, VisibilityState> nxLeftVisibility = {
+
+};
 }
 }
 
+/*
+ *     TextComboLineInput *nxLeftInput;
+    TextComboLineInput *nxRightInput;
+    TextComboLineInput *nBottomInput;
+    TextComboLineInput *nTopwInput;
+    TextComboLineInput *nWellInput;
+    TextComboLineInput *nzBottomInput;
+    TextComboLineInput *nzTopInput;
+    TextComboLineInput *nxBetweenInput;
+    TextComboLineInput *nyBetweenInput;
+*/
 namespace AreaShapes {
 const QList<QString> AreaShapes = {"Rectangular", "Infinite", "Cricled"};
 

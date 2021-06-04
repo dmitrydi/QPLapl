@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tabUnits">
      <attribute name="title">
@@ -772,7 +772,7 @@
         <x>10</x>
         <y>180</y>
         <width>281</width>
-        <height>80</height>
+        <height>311</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="layoutWellSched"/>
@@ -783,7 +783,7 @@
         <x>350</x>
         <y>180</y>
         <width>301</width>
-        <height>80</height>
+        <height>311</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="layoutGridSched"/>
@@ -794,7 +794,7 @@
         <x>680</x>
         <y>180</y>
         <width>331</width>
-        <height>80</height>
+        <height>311</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="layoutGridSetup"/>

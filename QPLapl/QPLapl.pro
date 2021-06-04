@@ -24,6 +24,7 @@ SOURCES += \
     matrix3dv.cpp \
     noteditabledelegate.cpp \
     pqgraphwindow.cpp \
+    pqtview.cpp \
     qgaus.cpp \
     qgrid1d.cpp \
     surfacegraph.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
     matrix3dv.h \
     noteditabledelegate.h \
     pqgraphwindow.h \
+    pqtview.h \
     qgaus.h \
     qgrid1d.h \
     quadrature.h \

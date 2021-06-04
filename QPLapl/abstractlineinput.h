@@ -21,6 +21,10 @@ public:
     void AddVisibilityDependency(const QString& controllerState, VisibilityState visState);
     void SetVisibilityController(AbstractControlledHidable const *visibilityController);
     virtual const QString CurrentText() const = 0;
+    virtual void SetTitleMinWidth(int width) = 0;
+    virtual void SetUnitsMinWidth(int width) = 0;
+    virtual int GetTitleWidth() const = 0;
+    virtual int GetUnitsWidth() const = 0;
     virtual ~AbstractControlledHidable() = default;
 protected:
     AbstractControlledHidable const *visibilityController;
@@ -29,6 +33,8 @@ public slots:
     void onVisibilityControllerChanged(const QString& value);
 signals:
     void VisibilityControllerChanged(const QString&);
+private:
+    void CheckCurrentState();
 
 };
 
@@ -44,8 +50,10 @@ public:
                                QWidget *parent = nullptr);
     void SetUnitsController(AbstractLineInput const *unitsController);
     void SetDefaultUnits(const QString& defaultUnits);
-    void SetTitleMinWidth(int width);
-    void SetUnitsMinWidth(int width);
+    void SetTitleMinWidth(int width) override;
+    void SetUnitsMinWidth(int width) override;
+    int GetTitleWidth() const override;
+    int GetUnitsWidth() const override;
     virtual ~AbstractLineInput() = default;
 public slots:
     void onUnitsControllerChanged(const QString& value);
@@ -120,8 +128,10 @@ public:
     const QString ComboText() const;
     void AddComboItem(const QString&);
     void SetValidator(const QValidator* validator);
-    void SetTitleMinWidth(int width);
-    void SetUnitsMinWidth(int width);
+    void SetTitleMinWidth(int width) override;
+    void SetUnitsMinWidth(int width) override;
+    int GetTitleWidth() const override;
+    int GetUnitsWidth() const override;
 private:
     QLabel *title_ptr;
     QList<QString> comboItems;
