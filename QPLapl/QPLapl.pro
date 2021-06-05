@@ -30,6 +30,7 @@ SOURCES += \
     surfacegraph.cpp \
     tablewellschedule.cpp \
     unicombobox.cpp \
+    wellcontroller.cpp \
     wellmanager.cpp \
     xymodel.cpp \
     picmanager.cpp
@@ -55,6 +56,7 @@ HEADERS += \
     surfacegraph.h \
     tablewellschedule.h \
     unicombobox.h \
+    wellcontroller.h \
     wellmanager.h \
     xymodel.h \
     picmanager.h
