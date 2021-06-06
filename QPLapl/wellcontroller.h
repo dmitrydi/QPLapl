@@ -4,9 +4,26 @@
 #include <QObject>
 #include <optional>
 #include <QString>
+#include <sstream>
+#include <stdexcept>
 #include "interfacemaps.h"
 #include "gwell.h"
 #include "qgrid1d.h"
+
+#define CH_OPT_MSG(opt_param, text) {          \
+    if(!(opt_param)) {                      \
+        throw std::logic_error(text);       \
+    }                                       \
+}
+
+#define CH_OPT(opt) {                               \
+    if (!opt) {                                      \
+        std::ostringstream os;                         \
+        os << #opt << " is not set\n";                 \
+        throw std::logic_error(os.str());              \
+    }                                                  \
+}
+
 
 class WellController : public QObject
 {
@@ -51,6 +68,8 @@ public:
     void setNzBottom(const QString& n, const QString& gridType);
     void setNzTop(const QString& n, const QString& gridType);
     void setNBetween(const QString& n, const QString& gridType);
+    //getters
+    double lref() const;
     double xed() const;
     double xwd() const;
     double yed() const;
@@ -60,18 +79,38 @@ public:
     double ld() const;
     double hd() const;
     double fcd() const;
+    WellType welltype() const;
     Boundary boundary() const;
-    double lref() const;
-    //getters
+    DrainageArea areashape() const;
     const std::vector<double>& getTValues() const;
     const std::vector<double>& getPQValues() const;
     const std::vector<double>& getTValuesDimentionless() const;
     const std::vector<double>& getPQValuesDimentionless() const;
     const std::vector<double>& getTGrid() const;
     const std::vector<double>& getTGridDimentionless() const;
-    QList<Matrix3DV>& getGrid() const;
-    QList<Matrix3DV>& getGridDimentionless() const;
+    const QList<Matrix3DV>& getGrid() const;
+    const QList<Matrix3DV>& getGridDimentionless() const;
 private:
+    enum class CalcMode {
+        ConstP,
+        ConstQ
+    };
+    const QHash<QString, CalcMode> mapStrCalcMode = {
+        {"Constant Liquid Rate", CalcMode::ConstQ},
+        {"Constant Wellbore Pressure", CalcMode::ConstP}
+    };
+    enum class UnitSystem {
+        Oilfield,
+        US,
+        SI,
+        Custom
+    };
+    const QHash<QString, UnitSystem> mapStrUnitSystem = {
+        {"Oilfield", UnitSystem::Oilfield},
+        {"US", UnitSystem::US},
+        {"SI", UnitSystem::SI},
+        {"Custom", UnitSystem::Custom}
+    };
     std::vector<double> ts, ps, qs;
     std::vector<double> tds, pds, qds;
     std::vector<double> tsGrid;
@@ -85,8 +124,8 @@ private:
     std::optional<WellType> wellType;
     std::optional<Boundary> boundaryConditions;
     std::optional<DrainageArea> areaShape;
-    std::optional<QString> unitSystem;
-    std::optional<QString> calcMode;
+    std::optional<UnitSystem> unitSystem;
+    std::optional<CalcMode> calcMode;
     // grid objects
     enum class GridType {
         Lin,

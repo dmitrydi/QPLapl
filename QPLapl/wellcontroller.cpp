@@ -192,16 +192,14 @@ void WellController::setAreaShape(const QString &ash_str)
 
 void WellController::setUnitsystem(const QString &us_str)
 {
-    if (us_str.isEmpty())
-        return;
-    unitSystem = us_str;
+    if (mapStrUnitSystem.contains(us_str))
+        unitSystem = mapStrUnitSystem.value(us_str);
 }
 
 void WellController::setCalcmode(const QString &cm_str)
 {
-    if (cm_str.isEmpty())
-        return;
-    calcMode = cm_str;
+    if (mapStrCalcMode.contains(cm_str))
+        calcMode = mapStrCalcMode.value(cm_str);
 }
 
 void WellController::setTimeSchedule(const std::vector<double> &ts_)
@@ -335,6 +333,152 @@ void WellController::setNBetween(const QString &n_str, const QString &gridType_s
     } else {
         throw std::invalid_argument("WellController::setNBetween: unknown grid type\n");
     }
+}
+
+
+double WellController::lref() const
+{
+    CH_OPT_MSG(wellType, "Well type is not set\n");
+    switch (*wellType) {
+    case WellType::Fracture:
+        CH_OPT_MSG(xf, "Fracture length is not set\n");
+        return *xf;
+    case WellType::MultiFractured:
+        CH_OPT_MSG(xf, "Fracture length is not set\n");
+        return *xf;
+    case WellType::Horizontal:
+        CH_OPT_MSG(lh, "Horizontal well length is not set\n");
+        return *lh;
+    case WellType::Vertical:
+        CH_OPT_MSG(rw, "Well radius is not set\n");
+        return *rw;
+    }
+}
+
+double WellController::xed() const
+{
+    CH_OPT_MSG(xe, "Xe is not set\n");
+    return *xe/lref();
+}
+
+double WellController::xwd() const
+{
+    CH_OPT_MSG(xw, "Xw is not set\n");
+    return *xw/lref();
+}
+
+double WellController::yed() const
+{
+    CH_OPT_MSG(ye, "Ye is not set\n");
+    return *ye/lref();
+}
+
+double WellController::ywd() const
+{
+    CH_OPT_MSG(yw, "Yw is not set\n");
+    return *yw/lref();
+}
+
+double WellController::zwd() const
+{
+    CH_OPT_MSG(h, "H is not set\n");
+    CH_OPT_MSG(zw, "Zw is not set\n");
+    CH_OPT_MSG(rw, "Rw is not set\n");
+    return ((*zw)+(*rw))/(*h);
+}
+
+double WellController::red() const
+{
+    CH_OPT_MSG(re, "Re is not set\n");
+    return *re/lref();
+}
+
+double WellController::ld() const
+{
+    return 1.;
+}
+
+double WellController::hd() const
+{
+    CH_OPT_MSG(h, "H is not set\n");
+    return *h/lref();
+}
+
+double WellController::fcd() const
+{
+    CH_OPT_MSG(Fcd, "Fcd is not set\n");
+    return *Fcd;
+}
+
+WellType WellController::welltype() const
+{
+    CH_OPT_MSG(wellType, "Welltype is not set\n");
+    return *wellType;
+}
+
+Boundary WellController::boundary() const
+{
+    CH_OPT_MSG(boundaryConditions, "Boundary conditions is not set\n");
+    return *boundaryConditions;
+}
+
+DrainageArea WellController::areashape() const
+{
+    CH_OPT_MSG(areaShape, "Area shape is not set\n");
+    return *areaShape;
+}
+
+const std::vector<double> &WellController::getTValues() const
+{
+    return ts;
+}
+
+const std::vector<double> &WellController::getPQValues() const
+{
+    CH_OPT_MSG(calcMode, "Calc mode is not set\n");
+    switch (*calcMode) {
+    case CalcMode::ConstP:
+        return qs;
+    case CalcMode::ConstQ:
+        return ps;
+    }
+}
+
+const std::vector<double> &WellController::getTValuesDimentionless() const
+{
+    return tds;
+}
+
+const std::vector<double> &WellController::getPQValuesDimentionless() const
+{
+    CH_OPT_MSG(calcMode, "Calc mode is not set\n");
+    switch (*calcMode) {
+    case CalcMode::ConstP:
+        return qds;
+    case CalcMode::ConstQ:
+        return pds;
+    }
+    //
+}
+
+const std::vector<double> &WellController::getTGrid() const
+{
+    return tsGrid;
+}
+
+const std::vector<double> &WellController::getTGridDimentionless() const
+{
+    return tdsGrid;
+}
+
+const QList<Matrix3DV> &WellController::getGrid() const
+{
+    return gridP;
+}
+
+const QList<Matrix3DV> &WellController::getGridDimentionless() const
+{
+    return gridPDimentionless;
 }
 
 std::vector<double> WellController::LinLogGrid(double xmin, double xmax, WellController::GridSetup gSetup, double factor)
