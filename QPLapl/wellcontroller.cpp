@@ -2,7 +2,62 @@
 
 WellController::WellController(QObject *parent) : QObject(parent)
 {
+}
 
+std::unique_ptr<LaplWell> WellController::makeWell() const
+{
+    CH_OPT(wellType);
+    CH_OPT(areaShape);
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        switch (*wellType) {
+        case WellType::Fracture:
+            return std::make_unique<Rectangular::Fracture>(*boundaryConditions, xwd(), xed(), ywd(), yed(), fcd());
+        default:
+            throw std::logic_error("not implemented well type\n");
+        }
+    default:
+        throw std::logic_error("not implemented area shape\n");
+    }
+}
+
+void WellController::CalculatePQ()
+{
+    CH_OPT(calcMode);
+    std::unique_ptr<LaplWell> well = makeWell();
+    tds = ConvertT_Td(ts);
+    switch (*calcMode) {
+    case CalcMode::ConstQ:
+        pds.resize(tds.size());
+        well->pwd_parallel(tds, pds, 4);
+        ps = ConvertPd_P(pds);
+        emit TPQReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(ts, ps));
+        emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, pds));
+    case CalcMode::ConstP:
+        qds.resize(tds.size());
+        well->qwd_parallel(tds, qds, 4);
+        qs = ConvertQd_Q(qds);
+        emit TPQReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(ts, qs));
+        emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, qds));
+    }
+}
+
+void WellController::CalculateGrid()
+{
+    std::unique_ptr<LaplWell> well = makeWell();
+    tdsGrid = ConvertT_Td(tsGrid);
+    std::vector<double> xdGrid = makeXGrid();
+    std::vector<double> ydGrid = makeYGrid();
+    std::vector<double> zdGrid = makeZGrid();
+    for (const auto t: tdsGrid) {
+        auto m = well->pd_m_parallel(t, 4, xdGrid, ydGrid, zdGrid);
+        gridPDimentionless.append(std::move(m));
+    };
+    gridP = ConvertGrid(gridPDimentionless, lref(), lref(), *h, dimP());
+    emit TGridReady(tsGrid);
+    emit TGridDimentionlessReady(tdsGrid);
+    emit GridReady(gridP);
+    emit GridDimentionlessReady(gridPDimentionless);
 }
 
 void WellController::setXe(const QString &xe_str)
@@ -208,6 +263,15 @@ void WellController::setTimeSchedule(const std::vector<double> &ts_)
     for (const auto& t: ts_) {
         if (t > 0.0)
             ts.push_back(t);
+    }
+}
+
+void WellController::setTimeShcheduleGrid(const std::vector<double> &ts_)
+{
+    tsGrid.reserve(ts_.size());
+    for (const auto& t: ts_) {
+        if (t>0.0)
+            tsGrid.push_back(t);
     }
 }
 
@@ -458,7 +522,6 @@ const std::vector<double> &WellController::getPQValuesDimentionless() const
     case CalcMode::ConstQ:
         return pds;
     }
-    //
 }
 
 const std::vector<double> &WellController::getTGrid() const
@@ -481,7 +544,370 @@ const QList<Matrix3DV> &WellController::getGridDimentionless() const
     return gridPDimentionless;
 }
 
-std::vector<double> WellController::LinLogGrid(double xmin, double xmax, WellController::GridSetup gSetup, double factor)
+double WellController::dimT() const
+{
+    CH_OPT(unitSystem);
+    CH_OPT(perm);
+    CH_OPT(fi);
+    CH_OPT(mu);
+    CH_OPT(ct);
+    switch (*unitSystem) {
+    case UnitSystem::Oilfield:
+        return 0.00036*(*perm)/((*fi)*(*mu)*(*ct)*lref()*lref());
+    default:
+        throw std::logic_error("unit system is not implemented\n");
+    }
+}
+
+double WellController::dimP() const
+{
+    CH_OPT(unitSystem);
+    CH_OPT(qWell);
+    CH_OPT(mu);
+    CH_OPT(boil);
+    CH_OPT(perm);
+    CH_OPT(h);
+    switch (*unitSystem) {
+    case UnitSystem::Oilfield:
+        return 18.42*(*qWell)*(*mu)*(*boil)/(*perm)/(*h);
+    default:
+        throw std::logic_error("unit system is not implemented\n");
+    }
+}
+
+double WellController::dimQ() const
+{
+    CH_OPT(unitSystem);
+    CH_OPT(perm);
+    CH_OPT(pInit);
+    CH_OPT(pWell);
+    CH_OPT(h);
+    CH_OPT(mu);
+    CH_OPT(boil);
+    switch (*unitSystem) {
+    case UnitSystem::Oilfield:
+        return (*pInit - *pWell)*(*perm)*(*h)/(18.42*(*mu)*(*boil));
+    default:
+        throw std::logic_error("unit system is not implemented\n");
+    }
+}
+
+std::vector<double> WellController::ConvertPd_P(const std::vector<double> &pds) const
+{
+    CH_OPT(pInit);
+    auto ans = ConvertVector(pds, dimP());
+    for (auto& p: ans)
+        p = *pInit - p;
+    return ans;
+}
+
+std::vector<double> WellController::ConvertQd_Q(const std::vector<double> &qds) const
+{
+    return ConvertVector(qds, dimQ());
+}
+
+std::vector<double> WellController::ConvertTd_T(const std::vector<double> &tds) const
+{
+    return ConvertVector(tds, 1./dimT());
+}
+
+std::vector<double> WellController::ConvertP_Pd(const std::vector<double> &ps) const
+{
+    std::vector<double> ans;
+    ans.reserve(ps.size());
+    for (const auto& p: ps) {
+        ans.push_back(*pInit-p);
+    }
+    return ConvertVector(ans, 1./dimP());
+}
+
+std::vector<double> WellController::ConvertQ_Qd(const std::vector<double> &qs) const
+{
+    return ConvertVector(qs, 1./dimQ());
+}
+
+std::vector<double> WellController::ConvertT_Td(const std::vector<double> &ts) const
+{
+    return ConvertVector(ts, dimT());
+}
+
+std::vector<double> WellController::ConvertVector(const std::vector<double> &vec, double mult) const
+{
+    std::vector<double> ans;
+    ans.reserve(vec.size());
+    for (const auto& v: vec) {
+        ans.push_back(mult*v);
+    }
+    return ans;
+}
+
+QList<Matrix3DV> WellController::ConvertGrid(const QList<Matrix3DV> &grid, double xmult, double ymult, double zmult, double valmult) const
+{
+    QList<Matrix3DV> ans;
+    for (const auto& _: grid) {
+        Matrix3DV m(_);
+        for (auto it = m.begin(); it != m.end(); ++it) {
+            it->x *= xmult;
+            it->y *= ymult;
+            it->z *= zmult;
+            it->val *= valmult;
+        }
+        ans.append(std::move(m));
+    }
+    return ans;
+}
+
+std::vector<double> WellController::makeGrid(const std::vector<std::pair<double, double> > &gridpoints
+                                           , const std::vector<const WellController::GridSetup *> &gridsetups) const
+{
+    std::vector<double> xgrid;
+    Q_ASSERT(gridpoints.size() == gridsetups.size());
+    for (size_t i = 0; i < gridpoints.size(); ++i) {
+        auto g = LinLogGrid(gridpoints[i].first, gridpoints[i].second, *gridsetups[i], LogGridFactor);
+        xgrid.insert(xgrid.end(), std::make_move_iterator(g.begin()), std::make_move_iterator(g.end()));
+    }
+    auto it = std::unique(xgrid.begin(), xgrid.end()); // remove duplicate points at ends of gridpoints[]
+    xgrid.erase(it, xgrid.end());
+    return xgrid;
+}
+
+std::vector<double> WellController::makeXGrid() const
+{
+    CH_OPT(wellType);
+    switch (*wellType) {
+    case WellType::Fracture:
+        return makeXGridFracture();
+    case WellType::Horizontal:
+        return makeXGridHorizontal();
+    case WellType::MultiFractured:
+        return makeXGridMultifracture();
+    case WellType::Vertical:
+        return makeXGridVertical();
+    default:
+        throw std::invalid_argument("unknown well type\n");
+    }
+}
+
+std::vector<double> WellController::makeXGridFracture() const
+{
+    CH_OPT(areaShape);
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(gsLeft);
+        CH_OPT(gsWellLeft);
+        CH_OPT(gsWellRight);
+        CH_OPT(gsRight);
+        gridpoints.push_back({0., xwd()-1.});
+        gridpoints.push_back({xwd()-1., xwd()});
+        gridpoints.push_back({xwd(), xwd()+1.});
+        gridpoints.push_back({xwd()+1., xed()});
+        gridsetups.push_back(&(*gsLeft));
+        gridsetups.push_back(&(*gsWellLeft));
+        gridsetups.push_back(&(*gsWellRight));
+        gridsetups.push_back(&(*gsRight));
+        return makeGrid(gridpoints, gridsetups);
+    default:
+        throw std::logic_error("area shape not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeXGridHorizontal() const
+{
+    return WellController::makeXGridFracture();
+}
+
+std::vector<double> WellController::makeXGridMultifracture() const
+{
+    CH_OPT(areaShape);
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(gsLeft);
+        CH_OPT(gsWellLeft);
+        CH_OPT(gsWellRight);
+        CH_OPT(gsRight);
+        CH_OPT(gsBetweenLeft);
+        CH_OPT(gsBetweenRight);
+        CH_OPT(mFracOrientation);
+        CH_OPT(nFrac);
+        if (*mFracOrientation == MultifracOrientation::Normal) {
+            return makeXGridFracture();
+        } else {
+            throw std::logic_error("parallel orientation not implemented\n");
+        }
+    default:
+        throw std::logic_error("area shape not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeXGridVertical() const
+{
+    CH_OPT(areaShape);
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(gsLeft);
+        CH_OPT(gsRight);
+        gridpoints.push_back({0., xwd()-1.});
+        gridpoints.push_back({xwd()+1., xed()});
+        gridsetups.push_back(&(*gsLeft));
+        gridsetups.push_back(&(*gsRight));
+        return makeGrid(gridpoints, gridsetups);
+    default:
+        throw std::logic_error("area shape not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeYGrid() const
+{
+    CH_OPT(wellType);
+    switch (*wellType) {
+    case WellType::Fracture:
+        return makeYGridFracture();
+    case WellType::Horizontal:
+        return makeYGridHorizontal();
+    case WellType::MultiFractured:
+        return makeYGridMultifracture();
+    case WellType::Vertical:
+        return makeYGridVertical();
+    default:
+        throw std::invalid_argument("unknown well type\n");
+    }
+}
+
+std::vector<double> WellController::makeYGridFracture() const
+{
+    CH_OPT(areaShape);
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(gsBottom);
+        CH_OPT(gsTop);
+        gridpoints.push_back({0., ywd()});
+        gridpoints.push_back({ywd(), yed()});
+        gridsetups.push_back(&(*gsBottom));
+        gridsetups.push_back(&(*gsTop));
+        return makeGrid(gridpoints, gridsetups);
+    default:
+        throw std::logic_error("area shape not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeYGridHorizontal() const
+{
+    return WellController::makeYGridFracture();
+}
+
+std::vector<double> WellController::makeYGridMultifracture() const
+{
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    CH_OPT(areaShape);
+    if (*areaShape == DrainageArea::Rectangular) {
+        CH_OPT(nFrac);
+        CH_OPT(lh);
+        CH_OPT(gsBottom);
+        CH_OPT(gsTop);
+        CH_OPT(gsBetweenLeft);
+        CH_OPT(gsBetweenRight);
+        if (*mFracOrientation == MultifracOrientation::Normal) {
+            double lhd = *lh/lref();
+            double dfracd2 = (*lh)/(*nFrac-1);
+            double ydstart = ywd() - lhd;
+            double ydcur = ydstart;
+            double ydend = ywd() + lhd;
+            gridpoints.push_back({0., ydstart});
+            gridsetups.push_back(&(*gsBottom));
+            for (int i = 0; i < 2*(*nFrac-1); ++i) {
+                gridpoints.push_back({ydcur, ydcur+dfracd2});
+                ydcur += dfracd2;
+            }
+            for (int i = 0; i < (*nFrac-1); ++i) {
+                gridsetups.push_back(&(*gsBetweenLeft));
+                gridsetups.push_back(&(*gsBetweenRight));
+            }
+            gridpoints.push_back({ydend, yed()});
+            gridsetups.push_back(&(*gsTop));
+            return makeGrid(gridpoints, gridsetups);
+        } else {
+            throw std::logic_error("parallel orientation is not implemented\n");
+        }
+    } else {
+        throw std::logic_error("area shape is not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeYGridVertical() const
+{
+    CH_OPT(areaShape);
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(gsBottom);
+        CH_OPT(gsTop);
+        gridpoints.push_back({0., ywd()-1});
+        gridpoints.push_back({ywd()+1, yed()});
+        gridsetups.push_back(&(*gsBottom));
+        gridsetups.push_back(&(*gsTop));
+        return makeGrid(gridpoints, gridsetups);
+    default:
+        throw std::logic_error("area shape not implemented\n");
+    }
+}
+
+std::vector<double> WellController::makeZGrid() const
+{
+    CH_OPT(wellType);
+    switch (*wellType) {
+    case WellType::Fracture:
+        return makeZGridFracture();
+    case WellType::Horizontal:
+        return makeZGridHorizontal();
+    case WellType::MultiFractured:
+        return makeZGridMultifracture();
+    case WellType::Vertical:
+        return makeZGridVertical();
+    default:
+        throw std::invalid_argument("unknown well type\n");
+    }
+}
+
+std::vector<double> WellController::makeZGridFracture() const
+{
+    return {0.};
+}
+
+std::vector<double> WellController::makeZGridHorizontal() const
+{
+    std::vector<std::pair<double, double>> gridpoints;
+    std::vector<const GridSetup*> gridsetups;
+    CH_OPT(rw);
+    CH_OPT(h);
+    double rwd = (*rw)/(*h);
+    gridpoints.push_back({0., zwd() - 2*rwd}); // zwd() = (zw+rw)/h;
+    gridpoints.push_back({zwd(), 1.});
+    gridsetups.push_back(&(*gszBottom));
+    gridsetups.push_back(&(*gszTop));
+    return makeGrid(gridpoints, gridsetups);
+}
+
+std::vector<double> WellController::makeZGridMultifracture() const
+{
+    return {0.};
+}
+
+std::vector<double> WellController::makeZGridVertical() const
+{
+    return {0.};
+}
+
+std::vector<double> WellController::LinLogGrid(double xmin, double xmax, WellController::GridSetup gSetup, double factor) const
 {
     int nseg = gSetup.nSegments;
     if (gSetup.gType == GridType::Lin) {
@@ -512,5 +938,6 @@ std::vector<double> WellController::LinLogGrid(double xmin, double xmax, WellCon
         return ans;
     }
 }
+
 
 

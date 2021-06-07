@@ -9,6 +9,7 @@
 #include "interfacemaps.h"
 #include "gwell.h"
 #include "qgrid1d.h"
+#include <memory>
 
 #define CH_OPT_MSG(opt_param, text) {          \
     if(!(opt_param)) {                      \
@@ -30,9 +31,6 @@ class WellController : public QObject
     Q_OBJECT
 public:
     explicit WellController(QObject *parent = nullptr);
-    // main functions
-    void CalculatePQ();
-    void CalculateGrid();
     // setters
     void setXe(const QString& xe_str);
     void setXw(const QString& xw_str);
@@ -60,6 +58,7 @@ public:
     void setUnitsystem(const QString& us_str);
     void setCalcmode(const QString& cm_str);
     void setTimeSchedule(const std::vector<double>& ts);
+    void setTimeShcheduleGrid(const std::vector<double>& ts);
     void setNLeft(const QString& n, const QString& gridType);
     void setNRight(const QString& n, const QString& gridType);
     void setNBottom(const QString& n, const QString& gridType);
@@ -90,6 +89,7 @@ public:
     const std::vector<double>& getTGridDimentionless() const;
     const QList<Matrix3DV>& getGrid() const;
     const QList<Matrix3DV>& getGridDimentionless() const;
+    static constexpr double LogGridFactor = 1.1;
 private:
     enum class CalcMode {
         ConstP,
@@ -121,11 +121,24 @@ private:
     std::optional<double> perm, fi, mu, boil, ct;
     std::optional<double> pWell, qWell, pInit;
     std::optional<int> nFrac;
+    std::optional<MultifracOrientation> mFracOrientation;
     std::optional<WellType> wellType;
     std::optional<Boundary> boundaryConditions;
     std::optional<DrainageArea> areaShape;
     std::optional<UnitSystem> unitSystem;
     std::optional<CalcMode> calcMode;
+    double dimT() const;
+    double dimP() const;
+    double dimQ() const;
+    std::unique_ptr<LaplWell> makeWell() const;
+    std::vector<double> ConvertPd_P(const std::vector<double>& pds) const;
+    std::vector<double> ConvertQd_Q(const std::vector<double>& qds) const;
+    std::vector<double> ConvertTd_T(const std::vector<double>& tds) const;
+    std::vector<double> ConvertP_Pd(const std::vector<double>& ps) const;
+    std::vector<double> ConvertQ_Qd(const std::vector<double>& qs) const;
+    std::vector<double> ConvertT_Td(const std::vector<double>& ts) const;
+    std::vector<double> ConvertVector(const std::vector<double> & vec, double mult) const;
+    QList<Matrix3DV> ConvertGrid(const QList<Matrix3DV>& grid, double xmult, double ymult, double zmult, double valmult) const;
     // grid objects
     enum class GridType {
         Lin,
@@ -144,9 +157,36 @@ private:
     std::optional<GridSetup> gsBottom, gsTop;
     std::optional<GridSetup> gszBottom, gszTop;
     std::optional<GridSetup> gsBetweenLeft, gsBetweenRight;
-    std::vector<double> LinLogGrid(double xmin, double xmax, GridSetup gSetup, double factor = 1.1);
+    std::vector<double> makeGrid(
+            const std::vector<std::pair<double, double>>& gridpoints
+          , const std::vector<const GridSetup*>& gridsetups
+            ) const;
+    std::vector<double> makeXGrid() const;
+    std::vector<double> makeXGridFracture() const;
+    std::vector<double> makeXGridHorizontal() const;
+    std::vector<double> makeXGridMultifracture() const;
+    std::vector<double> makeXGridVertical() const;
+    std::vector<double> makeYGrid() const;
+    std::vector<double> makeYGridFracture() const;
+    std::vector<double> makeYGridHorizontal() const;
+    std::vector<double> makeYGridMultifracture() const;
+    std::vector<double> makeYGridVertical() const;
+    std::vector<double> makeZGrid() const;
+    std::vector<double> makeZGridFracture() const;
+    std::vector<double> makeZGridHorizontal() const;
+    std::vector<double> makeZGridMultifracture() const;
+    std::vector<double> makeZGridVertical() const;
+    std::vector<double> LinLogGrid(double xmin, double xmax, GridSetup gSetup, double factor = 1.1) const;
+public slots:
+    void CalculatePQ();
+    void CalculateGrid();
 signals:
-
+    void TPQReady(std::pair<const std::vector<double>&, const std::vector<double>&>);
+    void TPQDimentionlessReady(std::pair<const std::vector<double>&, const std::vector<double>&>);
+    void TGridReady(const std::vector<double>&);
+    void TGridDimentionlessReady(const std::vector<double>&);
+    void GridReady(const QList<Matrix3DV>&);
+    void GridDimentionlessReady(const QList<Matrix3DV>&);
 };
 
 #endif // WELLCONTROLLER_H

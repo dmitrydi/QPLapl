@@ -61,6 +61,7 @@ class Matrix3DV {
 public:
     Matrix3DV(size_t nx, size_t ny, size_t nz = 1);
     Matrix3DV(size_t nx, size_t ny, size_t nz, double val);
+    Matrix3DV(const Matrix3DV& other);
     Matrix3DV();
     Matrix3DV(const std::string& filename);
     void UnsafeResize(size_t nx, size_t ny, size_t nz);

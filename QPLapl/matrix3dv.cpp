@@ -74,6 +74,11 @@ Matrix3DV::Matrix3DV(size_t nx, size_t ny, size_t nz, double val): nx(nx),
 
 }
 
+Matrix3DV::Matrix3DV(const Matrix3DV &other):
+    nx(other.nx), ny(other.ny), nz(other.nz), n(nx*ny*nz), data(other.data)
+{
+}
+
 Matrix3DV::Matrix3DV(): nx(0), ny(0), nz(0), n(0), data(0) {};
 
 void Matrix3DV::Update() {

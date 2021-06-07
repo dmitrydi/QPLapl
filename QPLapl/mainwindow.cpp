@@ -115,14 +115,6 @@ MainWindow::MainWindow(QWidget *parent)
     AlignLineInputs(ui->layoutRegime);
 
     // setup layoutGridSetup
-//    TextComboLineInput *nLeftInput;
-//    TextComboLineInput *nRightInput;
-//    TextComboLineInput *nBottomInput;
-//    TextComboLineInput *nTopInput;
-//    TextComboLineInput *nWellInput;
-//    TextComboLineInput *nzBottomInput;
-//    TextComboLineInput *nzTopInput;
-//    TextComboLineInput *nBetweenInput;
     nLeftInput = new TextComboLineInput("N left", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nLeftVisibility);
     nLeftInput->AddVisibilityController(areashapeInput);
     nLeftInput->AddVisibilityMap(AreaShapes::Maps::nLeftVisibility);
@@ -164,9 +156,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->layoutGridSetup->addWidget(nBetweenInput);
 
     ui->layoutGridSetup->addStretch(1);
-    //AlignLineInputs(ui->layoutGridSetup);
-
-
 
     // setup Well Schedule
     wellSchedView = new PQTView(

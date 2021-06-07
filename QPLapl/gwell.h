@@ -40,6 +40,11 @@ enum class DrainageArea {
     Circle
 };
 
+enum class MultifracOrientation {
+    Normal,
+    Parallel
+};
+
 class LaplWell {
 public:
     LaplWell();
