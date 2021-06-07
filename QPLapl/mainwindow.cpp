@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , graphWin(new PQGraphWindow(this))
     , gridWin(new GridPlot(this))
+    , wellController(new WellController(this))
 {
     ui->setupUi(this);
     wellManager = new WellManager(this);
@@ -21,24 +22,31 @@ MainWindow::MainWindow(QWidget *parent)
     ui->layoutFluidRock->setContentsMargins(0,0,0,0);
     permInput = new TextLineInput("Permeability", unitsInput, Units::Maps::Permeability);
     ui->layoutFluidRock->addWidget(permInput);
+    permInput->SetDefaultValue("1");
 
     payInput = new TextLineInput("Pay zone", unitsInput, Units::Maps::PayZone);
     ui->layoutFluidRock->addWidget(payInput);
+    payInput->SetDefaultValue("10");
 
     poroInput = new TextLineInput("Porosity", unitsInput, Units::Maps::Porosity);
     ui->layoutFluidRock->addWidget(poroInput);
+    poroInput->SetDefaultValue("0.1");
 
     viscInput = new TextLineInput("Viscosity", unitsInput, Units::Maps::Viscosity);
     ui->layoutFluidRock->addWidget(viscInput);
+    viscInput->SetDefaultValue("1");
 
     ctInput = new TextLineInput("Total Compressibility", unitsInput, Units::Maps::Ct);
     ui->layoutFluidRock->addWidget(ctInput);
+    ctInput->SetDefaultValue("0.0001");
 
     fvfInput = new TextLineInput("Formation Volume Factor", unitsInput, Units::Maps::FVF);
     ui->layoutFluidRock->addWidget(fvfInput);
+    fvfInput->SetDefaultValue("1");
 
     pinitInput = new TextLineInput("Initial Formation Pressure", unitsInput, Units::Maps::Pinit);
     ui->layoutFluidRock->addWidget(pinitInput);
+    pinitInput->SetDefaultValue("250");
 
     ui->layoutFluidRock->addStretch(1);
 
@@ -51,18 +59,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     xfInput = new TextLineInput("Fracture Half-Length", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::xfVisibility);
     ui->layoutWellProps->addWidget(xfInput);
+    xfInput->SetDefaultValue("100");
 
     fcdInput = new TextLineInput("Fracture Conductivity", unitsInput, Units::Maps::DimentionlessConductivity, welltypeInput, WellTypes::Maps::fcdVisibility);
     ui->layoutWellProps->addWidget(fcdInput);
+    fcdInput->SetDefaultValue("10");
 
     lhInput = new TextLineInput("Horizontal Well Length", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::lhVisibility);
     ui->layoutWellProps->addWidget(lhInput);
+    lhInput->SetDefaultValue("100");
 
     nfracInput = new TextLineInput("Number of Fractures", unitsInput, Units::Maps::Count, welltypeInput, WellTypes::Maps::nfracVisibility);
     ui->layoutWellProps->addWidget(nfracInput);
+    nfracInput->SetDefaultValue("1");
 
     rwInput = new TextLineInput("Well Radius", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::rwVisibility);
     ui->layoutWellProps->addWidget(rwInput);
+    rwInput->SetDefaultValue("0.1");
 
     ui->layoutWellProps->addStretch(1);
 
@@ -75,21 +88,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     xeInput = new TextLineInput("Xe", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xeVisibility);
     ui->layoutDrainageProps->addWidget(xeInput);
+    xeInput->SetDefaultValue("2000");
 
     yeInput = new TextLineInput("Ye", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xeVisibility);
     ui->layoutDrainageProps->addWidget(yeInput);
+    yeInput->SetDefaultValue("2000");
 
     xwInput = new TextLineInput("Xw", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::xwVisibility);
     ui->layoutDrainageProps->addWidget(xwInput);
+    xwInput->SetDefaultValue("1000");
 
     ywInput = new TextLineInput("Yw", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::ywVisibility);
     ui->layoutDrainageProps->addWidget(ywInput);
+    ywInput->SetDefaultValue("1000");
 
     zwInput = new TextLineInput("Zw", unitsInput, Units::Maps::Distance, welltypeInput, WellTypes::Maps::zwVisibility);
     ui->layoutDrainageProps->addWidget(zwInput);
+    zwInput->SetDefaultValue("5");
 
     reInput = new TextLineInput("Re", unitsInput, Units::Maps::Distance, areashapeInput, AreaShapes::Maps::reVisibility);
     ui->layoutDrainageProps->addWidget(reInput);
+    reInput->SetDefaultValue("1000");
 
     boundaryInput = new ComboLineinput("Boundary Conditions");
     boundaryInput->AddComboItems(BoundaryTypes::BoundaryTypes);
@@ -181,6 +200,23 @@ MainWindow::MainWindow(QWidget *parent)
                 WellRegimes::Maps::wellpresVisibility
                 );
     ui->layoutGridSched->addWidget(gridSchedView);
+
+    // Interface connections
+    // PQT connections
+    connect(wellSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::setupWellController);
+    connect(this, &MainWindow::RunPQCalc, wellController, &WellController::CalculatePQ);
+    connect(wellController, &WellController::GraphDataReady, graphWin, &PQGraphWindow::FillData);
+    connect(wellSchedView, &PQTView::ShowButtonPressed, graphWin, &PQGraphWindow::ShowGraph);
+    connect(wellSchedView, &PQTView::SaveButtonPressed, wellController, &WellController::SavePQT);
+    // Grid Connections
+    connect(gridSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::setupWellController);
+    connect(this, &MainWindow::RunGridCalc, wellController, &WellController::CalculateGrid);
+    connect(wellController, &WellController::GridReady, gridWin, &GridPlot::FillData);
+    connect(gridSchedView, &PQTView::ShowButtonPressed, gridWin, &GridPlot::ShowGraph);
+    connect(gridSchedView, &PQTView::SaveButtonPressed, wellController, &WellController::SaveGrid);
+
+
+
 
     //connect(wellSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::TestPQTGetters);
 
@@ -302,6 +338,60 @@ void MainWindow::testAbstractLineInput()
     textLine->SetUnitsMinWidth(40);
     ui->testLayoutReciever->addWidget(textLine);
 
+
+}
+
+void MainWindow::setupWellController()
+{
+    wellController->setXe(xeInput->CurrentText());
+    qDebug() << "setXe OK";
+    wellController->setXw(xwInput->CurrentText());
+    qDebug() << "setXw OK";
+    wellController->setYe(yeInput->CurrentText());
+    wellController->setYw(ywInput->CurrentText());
+    wellController->setZw(zwInput->CurrentText());
+    wellController->setRe(reInput->CurrentText());
+    wellController->setRw(rwInput->CurrentText());
+    wellController->setFcd(fcdInput->CurrentText());
+    wellController->setXf(xfInput->CurrentText());
+    wellController->setLh(lhInput->CurrentText());
+    wellController->setH(payInput->CurrentText());
+    wellController->setK(permInput->CurrentText());
+    wellController->setFi(poroInput->CurrentText());
+    wellController->setMu(viscInput->CurrentText());
+    wellController->setBoil(fvfInput->CurrentText());
+    wellController->setCt(ctInput->CurrentText());
+    wellController->setPwell(wellpresInput->CurrentText());
+    wellController->setQwell(liqrateInput->CurrentText());
+    wellController->setPinit(pinitInput->CurrentText());
+    wellController->setNfrac(nfracInput->CurrentText());
+    wellController->setWelltype(welltypeInput->CurrentText());
+    wellController->setBoundaryConditions(boundaryInput->CurrentText());
+    wellController->setAreaShape(areashapeInput->CurrentText());
+    wellController->setUnitsystem(unitsInput->CurrentText());
+    wellController->setCalcmode(regimeInput->CurrentText());
+    qDebug() << "setCalc mode OK";
+    wellController->setTimeSchedule(wellSchedView->GetTValues());
+    qDebug() << "setTimeSchedule OK";
+    wellController->setTimeShcheduleGrid(gridSchedView->GetTValues());
+    qDebug() << "setTimeShcheduleGrid OK";
+    wellController->setNLeft(nLeftInput->CurrentText(), nLeftInput->ComboText());
+    wellController->setNRight(nRightInput->CurrentText(), nRightInput->ComboText());
+    wellController->setNBottom(nBottomInput->CurrentText(), nBottomInput->ComboText());
+    wellController->setNTop(nTopInput->CurrentText(), nTopInput->ComboText());
+    wellController->setNWell(nWellInput->CurrentText(), nWellInput->ComboText());
+    wellController->setNzBottom(nzBottomInput->CurrentText(), nzBottomInput->ComboText());
+    wellController->setNzTop(nzTopInput->CurrentText(), nzTopInput->ComboText());
+    wellController->setNBetween(nBetweenInput->CurrentText(), nBetweenInput->ComboText());
+    qDebug() << "setNBetween OK";
+    PQTView* snd = qobject_cast<PQTView*>(sender());
+    qDebug() << "sender OK";
+    if (snd == wellSchedView)
+        emit RunPQCalc();
+    else if (snd == gridSchedView)
+        emit RunGridCalc();
+    else
+        qDebug() << "MainWindow::setupWellController(): unknown sender";
 
 }
 

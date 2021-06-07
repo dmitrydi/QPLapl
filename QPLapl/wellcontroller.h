@@ -10,6 +10,7 @@
 #include "gwell.h"
 #include "qgrid1d.h"
 #include <memory>
+#include <QVector>
 
 #define CH_OPT_MSG(opt_param, text) {          \
     if(!(opt_param)) {                      \
@@ -29,6 +30,11 @@
 class WellController : public QObject
 {
     Q_OBJECT
+public slots:
+    void CalculatePQ();
+    void CalculateGrid();
+    void SavePQT();
+    void SaveGrid();
 public:
     explicit WellController(QObject *parent = nullptr);
     // setters
@@ -115,6 +121,8 @@ private:
     std::vector<double> tds, pds, qds;
     std::vector<double> tsGrid;
     std::vector<double> tdsGrid;
+    QVector<std::pair<double, double>> TP;
+    QVector<std::pair<double, double>> TQ;
     QList<Matrix3DV> gridP;
     QList<Matrix3DV> gridPDimentionless;
     std::optional<double> xe, xw, ye, yw, zw, re, rw, Fcd, xf, lh, h;
@@ -176,10 +184,9 @@ private:
     std::vector<double> makeZGridHorizontal() const;
     std::vector<double> makeZGridMultifracture() const;
     std::vector<double> makeZGridVertical() const;
+    // utility
     std::vector<double> LinLogGrid(double xmin, double xmax, GridSetup gSetup, double factor = 1.1) const;
-public slots:
-    void CalculatePQ();
-    void CalculateGrid();
+    QVector<std::pair<double, double>> zipStdVectors(const std::vector<double>& vfirst, const std::vector<double>& vsecond);
 signals:
     void TPQReady(std::pair<const std::vector<double>&, const std::vector<double>&>);
     void TPQDimentionlessReady(std::pair<const std::vector<double>&, const std::vector<double>&>);
@@ -187,6 +194,7 @@ signals:
     void TGridDimentionlessReady(const std::vector<double>&);
     void GridReady(const QList<Matrix3DV>&);
     void GridDimentionlessReady(const QList<Matrix3DV>&);
+    void GraphDataReady(const QVector<std::pair<double, double>>&);
 };
 
 #endif // WELLCONTROLLER_H

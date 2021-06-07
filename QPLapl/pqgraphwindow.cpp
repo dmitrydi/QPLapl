@@ -113,7 +113,7 @@ void PQGraphWindow::FillData(const QVector<DataPoint>& datapoints) {
     for (const auto& dp: datapoints) {
         series->append({dp.first, dp.second});
     }
-    qDebug() << "Series filled with " << series->count();
+    qDebug() << "Series filled with " << series;
     emit DataFilled(series);
 }
 

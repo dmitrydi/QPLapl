@@ -20,6 +20,7 @@
 #include "abstractlineinput.h"
 #include "interfacemaps.h"
 #include "pqtview.h"
+#include "wellcontroller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -108,6 +109,7 @@ private:
     ComboLineinput *comboVisible;
 
     // new objects
+    WellController *wellController;
     // tab Units
     ComboLineinput *unitsInput;
     // tab Fluid and Rock
@@ -163,7 +165,10 @@ private:
 
     void AlignLineInputs(QVBoxLayout *vLayout);
 private slots:
-
+    void setupWellController();
+signals:
+    void RunPQCalc();
+    void RunGridCalc();
 
 
 };

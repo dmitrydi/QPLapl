@@ -1,4 +1,5 @@
 #include "wellcontroller.h"
+#include <QDebug>
 
 WellController::WellController(QObject *parent) : QObject(parent)
 {
@@ -23,27 +24,36 @@ std::unique_ptr<LaplWell> WellController::makeWell() const
 
 void WellController::CalculatePQ()
 {
+    qDebug() << "Start CalculatePQ";
     CH_OPT(calcMode);
     std::unique_ptr<LaplWell> well = makeWell();
+    qDebug() << "Make well OK";
     tds = ConvertT_Td(ts);
+    qDebug() << "tds OK size " << tds;
     switch (*calcMode) {
     case CalcMode::ConstQ:
         pds.resize(tds.size());
-        well->pwd_parallel(tds, pds, 4);
+        well->pwd_parallel(tds, pds, 1);
+        qDebug() << "pds OK " << pds;
         ps = ConvertPd_P(pds);
         emit TPQReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(ts, ps));
         emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, pds));
+        TP = zipStdVectors(ts, ps);
+        emit GraphDataReady(TP);
     case CalcMode::ConstP:
         qds.resize(tds.size());
         well->qwd_parallel(tds, qds, 4);
         qs = ConvertQd_Q(qds);
         emit TPQReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(ts, qs));
         emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, qds));
+        TQ = zipStdVectors(ts, qs);
+        emit GraphDataReady(TQ);
     }
 }
 
 void WellController::CalculateGrid()
 {
+    qDebug() << "WellController::CalculateGrid() called";
     std::unique_ptr<LaplWell> well = makeWell();
     tdsGrid = ConvertT_Td(tsGrid);
     std::vector<double> xdGrid = makeXGrid();
@@ -58,6 +68,16 @@ void WellController::CalculateGrid()
     emit TGridDimentionlessReady(tdsGrid);
     emit GridReady(gridP);
     emit GridDimentionlessReady(gridPDimentionless);
+}
+
+void WellController::SavePQT()
+{
+    throw std::logic_error("not implemented\n");
+}
+
+void WellController::SaveGrid()
+{
+    throw std::logic_error("not implemented\n");
 }
 
 void WellController::setXe(const QString &xe_str)
@@ -937,6 +957,18 @@ std::vector<double> WellController::LinLogGrid(double xmin, double xmax, WellCon
         }
         return ans;
     }
+}
+
+QVector<std::pair<double, double> > WellController::zipStdVectors(const std::vector<double> &vfirst, const std::vector<double> &vsecond)
+{
+    Q_ASSERT(vfirst.size() == vsecond.size());
+    size_t n = vfirst.size();
+    QVector<std::pair<double, double>> ans;
+    ans.reserve(n);
+    for (size_t i = 0; i < n; ++i) {
+        ans.push_back({vfirst[i], vsecond[i]});
+    }
+    return ans;
 }
 
 

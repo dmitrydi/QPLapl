@@ -52,6 +52,7 @@ public:
                                QWidget *parent = nullptr);
     void SetUnitsController(AbstractLineInput const *unitsController);
     void SetDefaultUnits(const QString& defaultUnits);
+    virtual void SetDefaultValue(const QString& value) = 0;
     void SetTitleMinWidth(int width) override;
     void SetUnitsMinWidth(int width) override;
     int GetTitleWidth() const override;
@@ -86,6 +87,7 @@ public:
                   const QHash<QString, VisibilityState>& mapVisibilityController = {},
                   QWidget *parent = nullptr);
     const QString CurrentText() const override;
+    void SetDefaultValue(const QString& value) override;
     ~TextLineInput() = default;
 private:
     QLineEdit *line_edit;
@@ -107,6 +109,7 @@ public:
                    const QHash<QString, VisibilityState>& mapVisibilityController = {},
                    QWidget *parent = nullptr);
     const QString CurrentText() const override;
+    void SetDefaultValue(const QString& value) override;
     void AddComboItem(const QString&);
     void AddComboItems(const QList<QString>&);
     ~ComboLineinput() = default;

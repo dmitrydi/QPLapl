@@ -180,6 +180,11 @@ const QString TextLineInput::CurrentText() const
     return line_edit->text();
 }
 
+void TextLineInput::SetDefaultValue(const QString &value)
+{
+    line_edit->setText(value);
+}
+
 ComboLineinput::ComboLineinput(const QString& title,
                                AbstractLineInput const *unitsController_,
                                const QHash<QString, QString>& mapUnitsController,
@@ -199,6 +204,11 @@ ComboLineinput::ComboLineinput(const QString& title,
 const QString ComboLineinput::CurrentText() const
 {
     return combo_box->currentText();
+}
+
+void ComboLineinput::SetDefaultValue(const QString &value)
+{
+    combo_box->setCurrentIndex(0);
 }
 
 void ComboLineinput::AddComboItem(const QString & text)
