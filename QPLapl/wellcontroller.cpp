@@ -40,6 +40,7 @@ void WellController::CalculatePQ()
         emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, pds));
         TP = zipStdVectors(ts, ps);
         emit GraphDataReady(TP);
+        break;
     case CalcMode::ConstP:
         qds.resize(tds.size());
         well->qwd_parallel(tds, qds, 4);
@@ -48,6 +49,7 @@ void WellController::CalculatePQ()
         emit TPQDimentionlessReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(tds, qds));
         TQ = zipStdVectors(ts, qs);
         emit GraphDataReady(TQ);
+        break;
     }
 }
 
@@ -279,6 +281,7 @@ void WellController::setCalcmode(const QString &cm_str)
 
 void WellController::setTimeSchedule(const std::vector<double> &ts_)
 {
+    ts.clear();
     ts.reserve(ts_.size());
     for (const auto& t: ts_) {
         if (t > 0.0)
@@ -288,6 +291,7 @@ void WellController::setTimeSchedule(const std::vector<double> &ts_)
 
 void WellController::setTimeShcheduleGrid(const std::vector<double> &ts_)
 {
+    tsGrid.clear();
     tsGrid.reserve(ts_.size());
     for (const auto& t: ts_) {
         if (t>0.0)

@@ -29,12 +29,13 @@ PQGraphWindow::PQGraphWindow(QWidget *parent) :
     connect(this, &PQGraphWindow::AxisUpdated, this, &PQGraphWindow::UpdateChart);
     onXStateChanged(Qt::Unchecked);
     onYStateChanged(Qt::Unchecked);
-    connect(ui->pushSave, &QPushButton::released, this, &PQGraphWindow::SaveData);
+    //connect(ui->pushSave, &QPushButton::released, this, &PQGraphWindow::SaveData);
     connect(ui->pushClose, &QPushButton::released, this, &PQGraphWindow::close);
 }
 
 void PQGraphWindow::UpdateChart() {
     chartView->update();
+    qDebug() << "PQGraphWindow::UpdateChart OK";
 }
 
 void PQGraphWindow::setXLinAxis(QtCharts::QLineSeries* series) {
@@ -42,6 +43,7 @@ void PQGraphWindow::setXLinAxis(QtCharts::QLineSeries* series) {
     xLinAxis->setLabelFormat("%g");
     xLinAxis->setTickCount(series->count());
     xLinAxis->setMax(series->at(series->count()-1).x());
+    qDebug() << "PQGraphWindow::setXLinAxis OK";
     emit AxisUpdated();
 }
 void PQGraphWindow::setYLinAxis(QtCharts::QLineSeries*) {
@@ -49,6 +51,7 @@ void PQGraphWindow::setYLinAxis(QtCharts::QLineSeries*) {
     yLinAxis->setLabelFormat("%g");
     yLinAxis->setTickCount(series->count());
     yLinAxis->setMax(series->at(0).y()*1.1);
+    qDebug() << "PQGraphWindow::setYLinAxis OK";
     emit AxisUpdated();
 }
 void PQGraphWindow::setXLogAxis(QtCharts::QLineSeries*) {
@@ -57,6 +60,7 @@ void PQGraphWindow::setXLogAxis(QtCharts::QLineSeries*) {
     xLogAxis->setBase(10.0);
     xLogAxis->setMinorTickCount(-1);
     xLogAxis->setMax(series->at(series->count()-1).x());
+    qDebug() << "PQGraphWindow::setXLogAxis OK";
     emit AxisUpdated();
 }
 void PQGraphWindow::setYLogAxis(QtCharts::QLineSeries*) {
@@ -65,6 +69,7 @@ void PQGraphWindow::setYLogAxis(QtCharts::QLineSeries*) {
     yLogAxis->setBase(10.0);
     yLogAxis->setMinorTickCount(-1);
     yLogAxis->setMax(series->at(0).y()*1.1);
+    qDebug() << "PQGraphWindow::setYLogAxis OK";
     emit AxisUpdated();
 }
 void PQGraphWindow::onXStateChanged(int state) {

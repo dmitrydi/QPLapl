@@ -228,6 +228,7 @@ MainWindow::MainWindow(QWidget *parent)
     //
 
     */
+    /*
     setupUComboUnits();
     setupUComboWellType();
     setupUComboAeaShape();
@@ -256,6 +257,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "No gridWidgets in MianWindow";
     }
     testAbstractLineInput();
+    */
 }
 
 void MainWindow::SetupPQSchedule() {

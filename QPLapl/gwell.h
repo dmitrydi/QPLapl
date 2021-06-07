@@ -186,7 +186,9 @@ public:
     Fracture(const Boundary boundary, const double xwd, const double xed,
             const double ywd, const double yed,
             const double Fcd, const double alpha = 0.);
-
+    ~Fracture() {
+        std::cerr<<"Fracture destroyed" << std::endl;
+    };
     double pd_lapl(const double u, const double xd, const double yd, const double zd = 0.) const override;
     double pwd_lapl(const double u) const override;
     double qwd_lapl(const double u) const override;
