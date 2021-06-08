@@ -33,7 +33,7 @@ void WellController::CalculatePQ()
     switch (*calcMode) {
     case CalcMode::ConstQ:
         pds.resize(tds.size());
-        well->pwd_parallel(tds, pds, 1);
+        well->pwd_parallel(tds, pds, 4);
         qDebug() << "pds OK " << pds;
         ps = ConvertPd_P(pds);
         emit TPQReady(std::make_pair<const std::vector<double>&, const std::vector<double>&>(ts, ps));
@@ -72,14 +72,22 @@ void WellController::CalculateGrid()
     emit GridDimentionlessReady(gridPDimentionless);
 }
 
-void WellController::SavePQT()
+void WellController::SavePQT(QTextStream& tstream) const
 {
-    throw std::logic_error("not implemented\n");
+    PrntUnits(tstream);
+    PrintFluidRock(tstream);
+    PrintWell(tstream);
+    PrintDrainageArea(tstream);
+    PrintPQData(tstream);
 }
 
-void WellController::SaveGrid()
+void WellController::SaveGrid(QTextStream& tstream) const
 {
-    throw std::logic_error("not implemented\n");
+    PrntUnits(tstream);
+    PrintFluidRock(tstream);
+    PrintWell(tstream);
+    PrintDrainageArea(tstream);
+    PrintGridData(tstream);
 }
 
 void WellController::setXe(const QString &xe_str)
@@ -566,6 +574,164 @@ const QList<Matrix3DV> &WellController::getGrid() const
 const QList<Matrix3DV> &WellController::getGridDimentionless() const
 {
     return gridPDimentionless;
+}
+
+void WellController::PrntUnits(QTextStream& tstream) const
+{
+    CH_OPT(unitSystem);
+    tstream << "====Unit System====\n";
+    tstream << mapUnitSystemToStr.at(*unitSystem) << "\n";
+}
+
+void WellController::PrintFluidRock(QTextStream& tstream) const
+{
+    CH_OPT(perm);
+    CH_OPT(h);
+    CH_OPT(fi);
+    CH_OPT(ct);
+    CH_OPT(mu);
+    CH_OPT(boil);
+    CH_OPT(unitSystem);
+    const QString& us = mapUnitSystemToStr.at(*unitSystem);
+    tstream << "====Fluid and Rock Properties====\n";
+    tstream << "Permeability " << *perm << " " << Units::Maps::Permeability.value(us) << "\n";
+    tstream << "Pay zone " << *h << " " << Units::Maps::PayZone.value(us) << "\n";
+    tstream << "Porosity " << *fi << " " << Units::Maps::Porosity.value(us) << "\n";
+    tstream << "Viscosity " << *mu << " " << Units::Maps::Viscosity.value(us) << "\n";
+    tstream << "Total compressibility " << *ct << " " << Units::Maps::Ct.value(us) << "\n";
+    tstream << "Formation volume factor " << *boil << " " << Units::Maps::FVF.value(us) << "\n";
+}
+
+void WellController::PrintWell(QTextStream& tstream) const
+{
+    CH_OPT(wellType);
+    CH_OPT(unitSystem);
+    const QString& us = mapUnitSystemToStr.at(*unitSystem);
+    tstream << "====Well Properties====\n";
+    switch (*wellType) {
+    case WellType::Fracture:
+        CH_OPT(xf);
+        CH_OPT(Fcd);
+        tstream << "Welltype: Fracture\n";
+        tstream << "Fracture half-length " << *xf << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Fcd " << *Fcd << " " << Units::Maps::DimentionlessConductivity.value(us) << "\n";
+        break;
+    case WellType::Horizontal:
+        CH_OPT(lh);
+        CH_OPT(rw);
+        tstream << "Welltype: Horizontal\n";
+        tstream << "Well length " << 2*(*lh) << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Well radius " << *rw << " " << Units::Maps::Distance.value(us) << "\n";
+        break;
+    case WellType::MultiFractured:
+        CH_OPT(xf);
+        CH_OPT(Fcd);
+        CH_OPT(nFrac);
+        CH_OPT(lh);
+        tstream << "Welltype: Multifractured\n";
+        tstream << "Fracture half-length " << *xf << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Fcd " << *Fcd << " " << Units::Maps::DimentionlessConductivity.value(us) << "\n";
+        tstream << "Number of fractures " << *nFrac << " " << Units::Maps::Count.value(us) << "\n";
+        tstream << "Horizontal well length " << 2*(*lh) << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Zw " << *zw << " " << Units::Maps::Distance.value(us) << "\n";
+        break;
+    case WellType::Vertical:
+        CH_OPT(rw);
+        tstream << "Welltype: Vertical\n";
+        tstream << "Well radius " << *rw << " " << Units::Maps::Distance.value(us) << "\n";
+        break;
+    default:
+        tstream << "Unknown welltype\n";
+    }
+}
+
+void WellController::PrintDrainageArea(QTextStream& tstream) const
+{
+    CH_OPT(areaShape);
+    CH_OPT(unitSystem);
+    const QString& us = mapUnitSystemToStr.at(*unitSystem);
+    tstream << "====Drainage Area Properties====\n";
+    switch (*areaShape) {
+    case DrainageArea::Rectangular:
+        CH_OPT(xe);
+        CH_OPT(ye);
+        CH_OPT(xw);
+        CH_OPT(yw);
+        tstream << "Drainage Area: Rectangular\n";
+        tstream << "Xe " << *xe << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Ye" << *ye << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Xw " << *xw << " " << Units::Maps::Distance.value(us) << "\n";
+        tstream << "Yw " << *yw << " " << Units::Maps::Distance.value(us) << "\n";
+        break;
+    case DrainageArea::Infinite:
+        tstream << "Darainage Area: Infinite\n";
+        break;
+    case DrainageArea::Circle:
+        CH_OPT(re);
+        tstream << "Drainage Area: Circle\n";
+        tstream << "External radius " << *re << " " << Units::Maps::Distance.value(us) << "\n";
+        break;
+    default:
+        tstream << "Unknown area shape\n";
+    }
+
+}
+
+void WellController::PrintPQData(QTextStream& tstream) const
+{
+    CH_OPT(calcMode);
+    CH_OPT(unitSystem);
+    const QString& us = mapUnitSystemToStr.at(*unitSystem);
+    tstream << "====Well Results====\n";
+    switch (*calcMode) {
+    case CalcMode::ConstQ:
+        CH_OPT(qWell);
+        tstream << "Constant Well Liquid Rate " << *qWell << " " << Units::Maps::LiquidRate.value(us) << "\n";
+        tstream << "Time, " << Units::Maps::TimeSmall.value(us) << " " << "Wellbore Pressure, " << Units::Maps::Pressure.value(us) << "\n";
+        for (const auto& d: TP) {
+            tstream << d.first << " " << d.second << "\n";
+        }
+        break;
+    case CalcMode::ConstP:
+        CH_OPT(pWell);
+        tstream << "Constant Wellbore Pressure " << *pWell << " " << Units::Maps::Pressure.value(us) << "\n";
+        tstream << "Time, " << Units::Maps::TimeSmall.value(us) << " " << "Liquid Rate, " << Units::Maps::LiquidRate.value(us) << "\n";
+        for (const auto& d: TQ) {
+            tstream << d.first << " " << d.second << "\n";
+        }
+        break;
+    default:
+        tstream << "\n";
+    }
+}
+
+QTextStream& operator<<(QTextStream& ts, const Matrix3DV& m) {
+    auto dims = m.GetDimentions();
+    ts << dims.nx << " " << dims.ny << " " << dims.nz << "\n";
+    for (size_t k = 0; k < dims.nz; ++k) {
+        for (size_t i = 0; i < dims.nx; ++ i) {
+            for (size_t j = 0; j < dims.ny; ++j) {
+                ts << m(i,j,k).x << " " << m(i,j,k).y << " " << m(i,j,k).z << " " << m(i,j,k).val << "\n";
+            }
+        }
+    }
+    return ts;
+}
+
+void WellController::PrintGridData(QTextStream& tstream) const
+{
+    tstream << "====Grid Results====\n";
+    CH_OPT(unitSystem);
+    const QString& us = mapUnitSystemToStr.at(*unitSystem);
+    tstream << "Grid units: " << Units::Maps::Distance.value(us) << ", "
+            << Units::Maps::Distance.value(us) << ", "
+            << Units::Maps::Distance.value(us) << ", "
+            << Units::Maps::Pressure.value(us) << "\n";
+    for (int i = 0; i < gridP.size(); ++i) {
+        tstream << "Timestep " << tsGrid[i] << " " << Units::Maps::TimeSmall.value(us) << "\n";
+        tstream << "x y z pressure\n";
+        tstream << gridP.at(i) << "\n";
+    }
 }
 
 double WellController::dimT() const

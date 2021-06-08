@@ -153,19 +153,15 @@ private:
     TextComboLineInput *nBetweenInput;
     //
 
-    //test functions
-    void TestPQTGetters() {
-        auto Ts = wellSchedView->GetTValues();
-        auto Ps = wellSchedView->GetPValues();
-        auto Qs = wellSchedView->GetQValues();
-        for (size_t i = 0; i < Ts.size(); ++i) {
-            qDebug() << Ts[i] << " " << Ps[i] << " " <<Qs[i];
-        }
-    }
+
 
     void AlignLineInputs(QVBoxLayout *vLayout);
 private slots:
     void setupWellController();
+    //test functions
+    void CatchComboSendText(const QString& t) {
+        qDebug() << "CatchComboSendText: " << t;
+    }
 signals:
     void RunPQCalc();
     void RunGridCalc();

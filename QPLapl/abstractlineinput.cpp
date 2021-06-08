@@ -172,6 +172,7 @@ TextLineInput::TextLineInput(const QString& title,
     delete blankWidget;
     connect(line_edit, &QLineEdit::textChanged, this, &AbstractLineInput::UnitsControllerChanged);
     connect(line_edit, &QLineEdit::textChanged, this, &AbstractControlledHidable::VisibilityControllerChanged);
+    connect(line_edit, &QLineEdit::textChanged, this, &TextLineInput::SendText);
     connect(line_edit, &QLineEdit::textChanged, this, &AbstractLineInput::SendText);
 }
 
@@ -198,6 +199,7 @@ ComboLineinput::ComboLineinput(const QString& title,
     delete blankWidget;
     connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractLineInput::UnitsControllerChanged);
     connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractControlledHidable::VisibilityControllerChanged);
+    connect(combo_box, &QComboBox::currentTextChanged, this, &ComboLineinput::SendText);
     connect(combo_box, &QComboBox::currentTextChanged, this, &AbstractLineInput::SendText);
 }
 
@@ -208,6 +210,7 @@ const QString ComboLineinput::CurrentText() const
 
 void ComboLineinput::SetDefaultValue(const QString &value)
 {
+    Q_UNUSED(value);
     combo_box->setCurrentIndex(0);
 }
 

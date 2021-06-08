@@ -28,7 +28,10 @@ GridPlot::GridPlot(QWidget *parent) :
     SetRbs();
     SetSliders();
     SetTimeBox();
+    saveButton = new QPushButton("Save grid data");
+    vLayout->addWidget(saveButton);
     this->setLayout(hLayout);
+    connect(saveButton, &QPushButton::clicked, this, &GridPlot::SaveData);
 }
 
 void GridPlot::FillData(const QList<Matrix3DV> & ListOfMatrices)
@@ -64,11 +67,6 @@ void GridPlot::ShowGraph()
 {
     qDebug() << "GridPlot::ShowGraph() called";
     this->show();
-}
-
-void GridPlot::SaveData()
-{
-
 }
 
 void GridPlot::SetContainerProps() {

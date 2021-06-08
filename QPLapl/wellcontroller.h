@@ -11,6 +11,8 @@
 #include "qgrid1d.h"
 #include <memory>
 #include <QVector>
+#include <QFile>
+#include <QFileDialog>
 
 #define CH_OPT_MSG(opt_param, text) {          \
     if(!(opt_param)) {                      \
@@ -26,6 +28,8 @@
     }                                                  \
 }
 
+QTextStream& operator<<(QTextStream& ts, const Matrix3DV& m);
+
 
 class WellController : public QObject
 {
@@ -33,8 +37,8 @@ class WellController : public QObject
 public slots:
     void CalculatePQ();
     void CalculateGrid();
-    void SavePQT();
-    void SaveGrid();
+    void SavePQT(QTextStream& tstream) const;
+    void SaveGrid(QTextStream& tstream) const;;
 public:
     explicit WellController(QObject *parent = nullptr);
     // setters
@@ -96,6 +100,13 @@ public:
     const QList<Matrix3DV>& getGrid() const;
     const QList<Matrix3DV>& getGridDimentionless() const;
     static constexpr double LogGridFactor = 1.1;
+    void PrntUnits(QTextStream&) const;
+    void PrintFluidRock(QTextStream&) const;
+    void PrintWell(QTextStream&) const;
+    void PrintDrainageArea(QTextStream&) const;
+    void PrintPQData(QTextStream&) const;
+    void PrintGridData(QTextStream&) const;
+
 private:
     enum class CalcMode {
         ConstP,
@@ -116,6 +127,23 @@ private:
         {"US", UnitSystem::US},
         {"SI", UnitSystem::SI},
         {"Custom", UnitSystem::Custom}
+    };
+    struct UnitHash {
+        size_t operator()(const UnitSystem& s) const {
+            return qHash(static_cast<int>(s));
+        }
+    };
+
+    struct UnitEqual {
+        bool operator() (const UnitSystem& lhs, const UnitSystem& rhs) const {
+            return static_cast<int>(lhs) == static_cast<int>(rhs);
+        }
+    };
+    const std::unordered_map<UnitSystem, QString, UnitHash, UnitEqual> mapUnitSystemToStr = {
+        {UnitSystem::Oilfield, "Oilfield"},
+        {UnitSystem::US, "US"},
+        {UnitSystem::SI, "SI"},
+        {UnitSystem::Custom, "Custom"}
     };
     std::vector<double> ts, ps, qs;
     std::vector<double> tds, pds, qds;

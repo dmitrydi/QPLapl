@@ -26,7 +26,7 @@ struct selectorEqual {
 };
 
 const std::unordered_map<imageSelector, QString, selectorHash, selectorEqual> selector_map = {
-    {{"Rectangular", "Fracture"}, ":/Fractured.jpg"},
+    {{"Rectangular", "Fractured"}, ":/Fractured.jpg"},
     {{"Rectangular", "Vertical"}, ":/Vertical.jpg"},
     {{"Rectangular", "Horizontal"}, ":/Horizontal.jpg"},
     {{"Rectangular", "Multifractured"}, ":/Multifractured.jpg"}

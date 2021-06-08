@@ -241,6 +241,11 @@ const QHash<QString, QString> Time = {
     {"US", "day"},
     {"SI", "s"}
 };
+const QHash<QString, QString> TimeSmall = {
+    {"Oilfield", "hr"},
+    {"US", "hr"},
+    {"SI", "s"}
+};
 const QHash<QString, QString> DimentionlessConductivity = {
     {"Oilfield", "dimentionless"},
     {"US", "dimentionless"},

@@ -26,10 +26,9 @@ public:
     explicit GridPlot(QWidget *parent = nullptr);
 public slots:
     void FillData(const QList<Matrix3DV>&);
-    void ShowGraph();
-    void SaveData();
+    void ShowGraph(); 
 signals:
-
+    void SaveData();
 private:
     Q3DSurface *graph;
     QWidget *container;
@@ -48,6 +47,7 @@ private:
     QSlider *axisMaxSliderZ;
     Matrix3DV grid;
     SurfaceGraph *modifier;
+    QPushButton *saveButton;
     void SetContainerProps();
     void SetRbs();
     void SetSliders();

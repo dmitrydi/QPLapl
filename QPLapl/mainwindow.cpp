@@ -133,6 +133,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     AlignLineInputs(ui->layoutRegime);
 
+    // setup Pic Manager
+    picMan = new PicManager(ui->wellScheme);
+    picMan -> setWellType(welltypeInput->CurrentText());
+    picMan->setDrainageShape(areashapeInput->CurrentText());
+    ui->wellScheme->setPixmap(picMan->getPixmap());
+    connect(welltypeInput, &ComboLineinput::SendText, picMan, &PicManager::setWellType);
+    connect(areashapeInput, &ComboLineinput::SendText, picMan, &PicManager::setDrainageShape);
+    connect(picMan, &PicManager::sendPixmap, ui->wellScheme, &QLabel::setPixmap);
+    connect(welltypeInput, &ComboLineinput::SendText, this, &MainWindow::CatchComboSendText);
+
     // setup layoutGridSetup
     nLeftInput = new TextComboLineInput("N left", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nLeftVisibility);
     nLeftInput->AddVisibilityController(areashapeInput);
@@ -181,7 +191,7 @@ MainWindow::MainWindow(QWidget *parent)
                 liqrateInput,
                 wellpresInput,
                 unitsInput,
-                Units::Maps::Time,
+                Units::Maps::TimeSmall,
                 Units::Maps::LiquidRate,
                 Units::Maps::Pressure,
                 regimeInput,
@@ -192,7 +202,7 @@ MainWindow::MainWindow(QWidget *parent)
                 liqrateInput,
                 wellpresInput,
                 unitsInput,
-                Units::Maps::Time,
+                Units::Maps::TimeSmall,
                 Units::Maps::LiquidRate,
                 Units::Maps::Pressure,
                 regimeInput,
@@ -207,14 +217,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::RunPQCalc, wellController, &WellController::CalculatePQ);
     connect(wellController, &WellController::GraphDataReady, graphWin, &PQGraphWindow::FillData);
     connect(wellSchedView, &PQTView::ShowButtonPressed, graphWin, &PQGraphWindow::ShowGraph);
-    connect(wellSchedView, &PQTView::SaveButtonPressed, wellController, &WellController::SavePQT);
+    connect(wellSchedView, &PQTView::SaveButtonPressed, this, &MainWindow::SavePQData);
+    connect(graphWin, &PQGraphWindow::SaveData, this, &MainWindow::SavePQData);
     // Grid Connections
     connect(gridSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::setupWellController);
     connect(this, &MainWindow::RunGridCalc, wellController, &WellController::CalculateGrid);
     connect(wellController, &WellController::GridReady, gridWin, &GridPlot::FillData);
     connect(gridSchedView, &PQTView::ShowButtonPressed, gridWin, &GridPlot::ShowGraph);
-    connect(gridSchedView, &PQTView::SaveButtonPressed, wellController, &WellController::SaveGrid);
-
+    connect(gridSchedView, &PQTView::SaveButtonPressed, this, &MainWindow::SaveGridData);
+    connect(gridWin, &GridPlot::SaveData, this, &MainWindow::SaveGridData);
 
 
 
@@ -427,16 +438,20 @@ void MainWindow::SavePQData()
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream stream(&file);
-        wellManager->PrintParams(stream);
-        for (const auto& d: PQTData) {
-            stream << d.first << " " << d.second << "\n";
-        }
+        wellController->SavePQT(stream);
     }
     file.close();
 }
 
 void MainWindow::SaveGridData() {
-    throw std::logic_error("not implemented\n");
+    QString filePath = QFileDialog::getSaveFileName(this, "grid_data.txt");
+    if (filePath.isEmpty()) return;
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+        wellController->SaveGrid(stream);
+    }
+    file.close();
 }
 
 //---------------------------------------

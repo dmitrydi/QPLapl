@@ -12,6 +12,7 @@
 #include <iterator>
 #include <exception>
 #include <cassert>
+#include <algorithm>
 #include "chbessel.h"
 #include "quadrature.h"
 #include "auxillary.h"
@@ -80,11 +81,12 @@ public:
     }
 
     template <typename Func>
-    void InverseLaplaceParallel(Func func, const std::vector<double>& tds, std::vector<double>& props, int nthreads) const {
+    void InverseLaplaceParallel(Func func, const std::vector<double>& tds, std::vector<double>& props, int nthreads_) const {
         assert (tds.size() == props.size());
         std::vector<std::future<void>> fut;
         auto xbegin = tds.begin();
         auto ybegin = props.begin();
+        int nthreads = std::min(nthreads_, static_cast<int>(tds.size()));
         for (int i = 0; i < nthreads; ++i) {
             fut.push_back(async(std::launch::async, [&]{return TSingleThread(func, xbegin++, tds.end(), ybegin++, nthreads);}));
         }
