@@ -8,11 +8,12 @@
 #include <stdexcept>
 #include "interfacemaps.h"
 #include "gwell.h"
-#include "qgrid1d.h"
+//#include "qgrid1d.h"
 #include <memory>
 #include <QVector>
 #include <QFile>
 #include <QFileDialog>
+#include <QTextStream>
 
 #define CH_OPT_MSG(opt_param, text) {          \
     if(!(opt_param)) {                      \

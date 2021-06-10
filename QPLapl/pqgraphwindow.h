@@ -6,11 +6,14 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QLogValueAxis>
 #include <QtCharts/QValueAxis>
-#include "wellmanager.h"
+
 
 namespace Ui {
 class PQGraphWindow;
 }
+
+
+using DataPoint = std::pair<double, double> ;
 
 class PQGraphWindow : public QDialog
 {

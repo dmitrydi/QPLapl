@@ -28,11 +28,7 @@ SOURCES += \
     qgaus.cpp \
     qgrid1d.cpp \
     surfacegraph.cpp \
-    tablewellschedule.cpp \
-    unicombobox.cpp \
     wellcontroller.cpp \
-    wellmanager.cpp \
-    xymodel.cpp \
     picmanager.cpp
 
 HEADERS += \
@@ -43,7 +39,6 @@ HEADERS += \
     gwell.h \
     interfacemaps.h \
     interp_1d.h \
-    labelmapper.h \
     linlogaxis.h \
     mainwindow.h \
     matrix3dv.h \
@@ -54,11 +49,7 @@ HEADERS += \
     qgrid1d.h \
     quadrature.h \
     surfacegraph.h \
-    tablewellschedule.h \
-    unicombobox.h \
     wellcontroller.h \
-    wellmanager.h \
-    xymodel.h \
     picmanager.h
 
 FORMS += \
