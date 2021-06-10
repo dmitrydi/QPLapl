@@ -26,7 +26,6 @@ SOURCES += \
     pqgraphwindow.cpp \
     pqtview.cpp \
     qgaus.cpp \
-    qgrid1d.cpp \
     surfacegraph.cpp \
     wellcontroller.cpp \
     picmanager.cpp
@@ -46,7 +45,6 @@ HEADERS += \
     pqgraphwindow.h \
     pqtview.h \
     qgaus.h \
-    qgrid1d.h \
     quadrature.h \
     surfacegraph.h \
     wellcontroller.h \

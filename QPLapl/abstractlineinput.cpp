@@ -58,6 +58,16 @@ void AbstractControlledHidable::AddVisibilityController(const AbstractControlled
     CheckCurrentState();
 }
 
+void AbstractControlledHidable::showEvent(QShowEvent *)
+{
+    emit WidgetVisibilityChanged(true);
+}
+
+void AbstractControlledHidable::hideEvent(QHideEvent *)
+{
+    emit WidgetVisibilityChanged(false);
+}
+
 void AbstractControlledHidable::onVisibilityControllerChanged(const QString &value)
 {
     if (mapVisibilityController.contains(value))
@@ -289,4 +299,59 @@ int TextComboLineInput::GetTitleWidth() const
 int TextComboLineInput::GetUnitsWidth() const
 {
     return box_ptr->width();
+}
+
+CheckBoxHidable::CheckBoxHidable(const QString &text,
+                                 const AbstractControlledHidable *visibilityController,
+                                 const QHash<QString, VisibilityState> &mapVisibilityController,
+                                 QWidget *parent): AbstractControlledHidable(visibilityController,
+                                                                             mapVisibilityController,
+                                                                             parent)
+{
+    chBox = new QCheckBox(text);
+    layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(chBox);
+    connect(chBox, &QCheckBox::stateChanged, this, &CheckBoxHidable::onCheckBoxChanged);
+}
+
+const QString CheckBoxHidable::CurrentText() const
+{
+    return chBox->text();
+}
+
+void CheckBoxHidable::SetTitleMinWidth(int width)
+{
+    Q_UNUSED(width);
+}
+
+void CheckBoxHidable::SetUnitsMinWidth(int width)
+{
+    Q_UNUSED(width);
+}
+
+int CheckBoxHidable::GetTitleWidth() const
+{
+    return 0;
+}
+
+int CheckBoxHidable::GetUnitsWidth() const
+{
+    return 0;
+}
+
+bool CheckBoxHidable::IsChecked() const
+{
+    if (chBox->checkState() == Qt::CheckState::Unchecked)
+        return false;
+    else
+        return true;
+}
+
+void CheckBoxHidable::onCheckBoxChanged(int state)
+{
+    if (state == 0)
+        emit SetChecked(false);
+    else
+        emit SetChecked(true);
 }

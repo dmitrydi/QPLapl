@@ -24,11 +24,14 @@ public:
             const AbstractLineInput *visibilityController = nullptr,
             const QHash<QString, VisibilityState>& mapLiquidVisibility = {},
             const QHash<QString, VisibilityState>& mapPressureVisibility = {},
+            const AbstractControlledHidable *globalVisController = nullptr,
             QWidget *parent = nullptr
             );
     std::vector<double> GetTValues() const;
     std::vector<double> GetPValues() const;
     std::vector<double> GetQValues() const;
+    void CheckGlobalControllerState();
+    void SetVisible(bool);
 private:
     const AbstractLineInput *liquidSource;
     const AbstractLineInput *pressureSource;
@@ -40,6 +43,8 @@ private:
     const AbstractLineInput *visibilityController;
     QHash<QString, VisibilityState> mapLiquidVisibility;
     QHash<QString, VisibilityState> mapPressureVisibility;
+
+    const AbstractControlledHidable *globalController;
 
     QStandardItemModel *model;
     QTableView *view;

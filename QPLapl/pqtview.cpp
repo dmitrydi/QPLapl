@@ -1,5 +1,5 @@
 #include "pqtview.h"
-
+#include <QDebug>
 
 
 PQTView::PQTView(
@@ -12,6 +12,7 @@ PQTView::PQTView(
         const AbstractLineInput *avisibilityController,
         const QHash<QString, VisibilityState>& amapLiquidVisibility,
         const QHash<QString, VisibilityState>& amapPressureVisibility,
+        const AbstractControlledHidable *glCntr,
         QWidget *parent):
     QWidget(parent)
   , liquidSource(aliquidSource)
@@ -23,6 +24,7 @@ PQTView::PQTView(
   , visibilityController(avisibilityController)
   , mapLiquidVisibility(amapLiquidVisibility)
   , mapPressureVisibility(amapPressureVisibility)
+  , globalController(glCntr)
 {
     vLayout = new QVBoxLayout(this);
     hLayout = new QHBoxLayout();
@@ -60,6 +62,8 @@ PQTView::PQTView(
     connect(buttonCalculate, &QPushButton::pressed, this, &PQTView::CalcButtonPressed);
     connect(buttonSave, &QPushButton::pressed, this, &PQTView::SaveButtonPressed);
     connect(buttonShow, &QPushButton::pressed, this, &PQTView::ShowButtonPressed);
+    if (globalController)
+        connect(globalController, &AbstractControlledHidable::WidgetVisibilityChanged, this, &QWidget::setVisible);
 }
 
 std::vector<double> PQTView::GetTValues() const
@@ -75,6 +79,21 @@ std::vector<double> PQTView::GetPValues() const
 std::vector<double> PQTView::GetQValues() const
 {
     return GetColumnValues(2);
+}
+
+void PQTView::CheckGlobalControllerState()
+{
+
+}
+
+void PQTView::SetVisible(bool visible)
+{
+    qDebug() << "PQTView::SetVisible: " << visible;
+    if (visible) {
+        this->setVisible(true);
+    } else {
+        this->setVisible(false);
+    }
 }
 
 QString PQTView::GetCurrentUnitsByController(const QHash<QString, QString> &mapUnits) const

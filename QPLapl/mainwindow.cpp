@@ -146,41 +146,57 @@ MainWindow::MainWindow(QWidget *parent)
     nLeftInput = new TextComboLineInput("N left", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nLeftVisibility);
     nLeftInput->AddVisibilityController(areashapeInput);
     nLeftInput->AddVisibilityMap(AreaShapes::Maps::nLeftVisibility);
+    nLeftInput->AddVisibilityController(regimeInput);
+    nLeftInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nLeftInput);
 
     nRightInput = new TextComboLineInput("N right", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nRightVisibility);
     nRightInput->AddVisibilityController(areashapeInput);
     nRightInput->AddVisibilityMap(AreaShapes::Maps::nRightVisibility);
+    nRightInput->AddVisibilityController(regimeInput);
+    nRightInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nRightInput);
 
     nBottomInput = new TextComboLineInput("N bottom", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nBottomVisibility);
     nBottomInput->AddVisibilityController(areashapeInput);
     nBottomInput->AddVisibilityMap(AreaShapes::Maps::nBottomVisibility);
+    nBottomInput->AddVisibilityController(regimeInput);
+    nBottomInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nBottomInput);
 
     nTopInput = new TextComboLineInput("N top", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nTopVisibility);
     nTopInput->AddVisibilityController(areashapeInput);
     nTopInput->AddVisibilityMap(AreaShapes::Maps::nTopVisibility);
+    nTopInput->AddVisibilityController(regimeInput);
+    nTopInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nTopInput);
 
     nWellInput = new TextComboLineInput("N Well", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nWellVisibility);
     nWellInput->AddVisibilityController(areashapeInput);
     nWellInput->AddVisibilityMap(AreaShapes::Maps::nWellVisibility);
+    nWellInput->AddVisibilityController(regimeInput);
+    nWellInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nWellInput);
 
     nzBottomInput = new TextComboLineInput("Nz Bottom", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nzBottomVisibility);
     nzBottomInput->AddVisibilityController(areashapeInput);
     nzBottomInput->AddVisibilityMap(AreaShapes::Maps::nzBottomVisibility);
+    nzBottomInput->AddVisibilityController(regimeInput);
+    nzBottomInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nzBottomInput);
 
     nzTopInput = new TextComboLineInput("Nz Top", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nzTopVisibility);
     nzTopInput->AddVisibilityController(areashapeInput);
     nzTopInput->AddVisibilityMap(AreaShapes::Maps::nzTopVisibility);
+    nzTopInput->AddVisibilityController(regimeInput);
+    nzTopInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nzTopInput);
 
     nBetweenInput = new TextComboLineInput("N between", {"Lin", "Log"}, welltypeInput, WellTypes::Maps::nBetweenVisibility);
     nBetweenInput->AddVisibilityController(areashapeInput);
     nBetweenInput->AddVisibilityMap(AreaShapes::Maps::nBetweenVisibility);
+    nBetweenInput->AddVisibilityController(regimeInput);
+    nBetweenInput->AddVisibilityMap(WellRegimes::Maps::liqrateVisibility);
     ui->layoutGridSetup->addWidget(nBetweenInput);
 
     ui->layoutGridSetup->addStretch(1);
@@ -210,6 +226,20 @@ MainWindow::MainWindow(QWidget *parent)
                 );
     ui->layoutGridSched->addWidget(gridSchedView);
 
+    // grid check box
+    gridCheckBox = new CheckBoxHidable("Calculate grid", regimeInput, WellRegimes::Maps::liqrateVisibility);
+    ui->checkBoxLayout->addWidget(gridCheckBox);
+    /*
+     *     TextComboLineInput *nRightInput;
+    TextComboLineInput *nBottomInput;
+    TextComboLineInput *nTopInput;
+    TextComboLineInput *nWellInput;
+    TextComboLineInput *nzBottomInput;
+    TextComboLineInput *nzTopInput;
+    TextComboLineInput *nBetweenInput;
+     */
+
+
     // Interface connections
     // PQT connections
     connect(wellSchedView, &PQTView::CalcButtonPressed, this, &MainWindow::setupWellController);
@@ -225,6 +255,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(gridSchedView, &PQTView::ShowButtonPressed, gridWin, &GridPlot::ShowGraph);
     connect(gridSchedView, &PQTView::SaveButtonPressed, this, &MainWindow::SaveGridData);
     connect(gridWin, &GridPlot::SaveData, this, &MainWindow::SaveGridData);
+    gridSchedView->hide();
+    // check box connections
+    connect(gridCheckBox, &AbstractControlledHidable::WidgetVisibilityChanged, gridSchedView, &QWidget::setVisible);
+    gridSchedView->SetVisible(gridCheckBox->IsChecked());
+    ui->layoutGridSched->update();
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, gridSchedView, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nLeftInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nRightInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nBottomInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nTopInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nWellInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nzBottomInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nzTopInput, &QWidget::setVisible);
+    connect(gridCheckBox, &CheckBoxHidable::SetChecked, nBetweenInput, &QWidget::setVisible);
+    nLeftInput->setVisible(gridCheckBox->IsChecked());
+    nRightInput->setVisible(gridCheckBox->IsChecked());
+    nBottomInput->setVisible(gridCheckBox->IsChecked());
+    nTopInput->setVisible(gridCheckBox->IsChecked());
+    nWellInput->setVisible(gridCheckBox->IsChecked());
+    nzBottomInput->setVisible(gridCheckBox->IsChecked());
+    nzTopInput->setVisible(gridCheckBox->IsChecked());
+    nBetweenInput->setVisible(gridCheckBox->IsChecked());
+
 }
 
 MainWindow::~MainWindow()

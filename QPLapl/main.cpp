@@ -9,3 +9,10 @@ int main(int argc, char *argv[])
     w.show();
     return a.exec();
 }
+
+// TODO:
+// align inputs
+// set int checkers for grid inputs
+// catch void inputs
+// add grid visibility checkbox
+// add timesteps to grid graph

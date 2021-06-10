@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QDoubleValidator>
+#include <QCheckBox>
 #include "interfacemaps.h"
 
 class AbstractControlledHidable: public QWidget
@@ -28,6 +29,8 @@ public:
     virtual int GetUnitsWidth() const = 0;
     virtual ~AbstractControlledHidable() = default;
 protected:
+    void showEvent(QShowEvent*) override;
+    void hideEvent(QHideEvent*) override;
     QList<const AbstractControlledHidable *> controllers;
     //AbstractControlledHidable const *visibilityController;
     QHash<QString, VisibilityState> mapVisibilityController;
@@ -35,6 +38,7 @@ public slots:
     void onVisibilityControllerChanged(const QString& value);
 signals:
     void VisibilityControllerChanged(const QString&);
+    void WidgetVisibilityChanged(bool);
 private:
     void CheckCurrentState();
 
@@ -143,6 +147,27 @@ private:
     QComboBox *box_ptr;
     QHBoxLayout *layout_ptr;
     QLineEdit *line_ptr;
+};
+
+class CheckBoxHidable : public AbstractControlledHidable{
+    Q_OBJECT
+public:
+    CheckBoxHidable(const QString& text, AbstractControlledHidable const *visibilityController = nullptr,
+                    const QHash<QString, VisibilityState>& mapVisibilityController = {},
+                    QWidget *parent = nullptr);
+    const QString CurrentText() const override;
+    void SetTitleMinWidth(int width) override;
+    void SetUnitsMinWidth(int width) override;
+    int GetTitleWidth() const override;
+    int GetUnitsWidth() const override;
+    bool IsChecked() const;
+private:
+    QCheckBox* chBox;
+    QHBoxLayout *layout;
+private slots:
+    void onCheckBoxChanged(int);
+signals:
+    void SetChecked(bool);
 };
 
 #endif // ABSTRACTLINEINPUT_H

@@ -11,7 +11,6 @@
 #include "picmanager.h"
 #include "noteditabledelegate.h"
 #include "pqgraphwindow.h"
-//#include "qgrid1d.h"
 #include "gridplot.h"
 #include "abstractlineinput.h"
 #include "interfacemaps.h"
@@ -85,7 +84,8 @@ private:
     TextComboLineInput *nzBottomInput;
     TextComboLineInput *nzTopInput;
     TextComboLineInput *nBetweenInput;
-    //
+    // check box
+    CheckBoxHidable *gridCheckBox;
     void AlignLineInputs(QVBoxLayout *vLayout);
 private slots:
     void setupWellController();
